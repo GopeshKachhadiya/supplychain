@@ -57,13 +57,13 @@ class RouteOptimizer:
             'stops_count': len(route)
         }
 
-if __name__ == '__main__':
+def nearest_neighbor_route(start_wh: str, stops: list) -> dict:
     optimizer = RouteOptimizer()
-    stops = ['WH_02', 'WH_03', 'WH_04', 'WH_05', 'WH_06', 'WH_10']
-    result = optimizer.get_optimal_route('WH_01', stops)
-    if "error" not in result:
-        print("Optimized Route:", " -> ".join(result['route']))
-        print(f"Total Distance : {result['total_distance_km']} km")
-        print(f"Estimated Time : {result['estimated_time_hrs']} hours")
-    else:
-        print(result["error"])
+    return optimizer.get_optimal_route(start_wh, stops)
+
+if __name__ == '__main__':
+    stops = ['WH_02', 'WH_03', 'WH_04', 'WH_05']
+    result = nearest_neighbor_route('WH_01', stops)
+    print("Optimized Route:", " → ".join(result['route']))
+    print(f"Total Distance : {result['total_distance_km']} km")
+    print(f"Estimated Time : {result['estimated_time_hrs']} hours")

@@ -16,6 +16,8 @@ class InventoryOptimizer:
             self.external = None
 
     def compute_eoq(self, annual_demand, order_cost, holding_cost_per_unit):
+        if holding_cost_per_unit <= 0:
+            holding_cost_per_unit = 12
         return np.sqrt((2 * annual_demand * order_cost) / holding_cost_per_unit)
 
     def compute_safety_stock(self, avg_daily_demand, std_daily_demand,
@@ -36,7 +38,7 @@ class InventoryOptimizer:
                 continue
 
             lead_time    = int(inv_row['supplier_lead_time_days'].values[0])
-            holding_cost = float(inv_row['holding_cost'].values[0])
+            holding_cost = float(inv_row['holding_cost_per_unit'].values[0] if 'holding_cost_per_unit' in inv_row else inv_row['holding_cost'].values[0])
             category     = inv_row['category'].values[0]
 
             avg_d        = grp['units_sold'].mean()
@@ -133,4 +135,4 @@ if __name__ == '__main__':
     result_df = opt.optimize_all(warehouse_id='WH_01')
     print(result_df.head(10).to_string())
     result_df.to_csv('inventory_optimization_results.csv', index=False)
-    print("Saved -> inventory_optimization_results.csv")
+    print("✅ Saved → inventory_optimization_results.csv")
