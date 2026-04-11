@@ -8,7 +8,10 @@ import {
   Route as RouteIcon,
   ChevronDown,
   Plus,
-  Play
+  Play,
+  CheckCircle,
+  RefreshCcw,
+  Box
 } from 'lucide-react';
 import { fetchWarehouses } from '@/services/api';
 import { cn } from '@/lib/utils';
