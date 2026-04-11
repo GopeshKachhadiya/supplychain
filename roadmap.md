@@ -722,7 +722,10 @@ export const fetchAlerts = async () => {
 - Build the necessary components for charts (using `recharts`) and data tables.
 - Deploy the finalized frontend to Vercel via GitHub integration.
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3802917c6c28bcebf9ce01e9e4019859f443af50
 ---
 
 ### 🟣 HOUR 6–10: Integration + Polish (Member 5 — Team Lead / Full-Stack)

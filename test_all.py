@@ -67,6 +67,13 @@ r = test('POST /api/routing/optimize (all 10 warehouses)',
 if r:
     print(f'         -> Full Route: {" -> ".join(r["route"]["route"])}')
 
+r = test('POST /api/routing/optimize (Gandhinagar locations)',
+         f'{BASE}/api/routing/optimize',
+         body={'start_warehouse': 'WH_01', 
+               'stops': ['GN_01', 'GN_02', 'GN_03', 'WH_07']})
+if r:
+    print(f'         -> GN Route: {" -> ".join(r["route"]["route"])}')
+
 # Test invalid warehouse — expects a 400 error (this IS the correct behavior)
 try:
     data = json.dumps({'start_warehouse': 'WH_99', 'stops': ['WH_01']}).encode()

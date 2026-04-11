@@ -35,8 +35,16 @@ export const fetchProducts = async () => {
 };
 
 export const fetchWarehouses = async () => {
-    const res = await api.get('/api/forecast/warehouses');
+    const res = await api.get('/api/routing/warehouses');
     return res.data.warehouses;
+};
+
+export const fetchRoute = async (startWarehouse: string, stops: string[]) => {
+    const res = await api.post('/api/routing/optimize', {
+        start_warehouse: startWarehouse,
+        stops: stops
+    });
+    return res.data.route;
 };
 
 export default api;

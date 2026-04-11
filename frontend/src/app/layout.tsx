@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "AntiGravity | Supply Chain AI",
+  title: "AnvayaAI | Supply Chain AI",
   description: "Advanced AI-driven supply chain optimization platform.",
 };
 

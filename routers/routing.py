@@ -39,7 +39,12 @@ def list_route_warehouses():
     """Returns all warehouses with their geographic coordinates."""
     return {
         "warehouses": [
-            {"id": wh_id, "lat": lat, "lon": lon}
+            {
+                "id": wh_id, 
+                "name": _route_engine.WAREHOUSE_QUERIES.get(wh_id, "Unknown Location").split(",")[0],
+                "lat": lat, 
+                "lon": lon
+            }
             for wh_id, (lat, lon) in _route_engine.WAREHOUSES.items()
         ]
     }
