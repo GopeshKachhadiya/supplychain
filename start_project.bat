@@ -6,7 +6,7 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000') do taskkill /f /pid %
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3000') do taskkill /f /pid %%a >nul 2>&1
 
 echo [2/3] Starting FastAPI Backend in a new window...
-start "AntiGravity Backend" cmd /k "python -m uvicorn backend.main:app --reload --port 8000"
+start "AntiGravity Backend" cmd /k "python -m uvicorn main:app --reload --port 8000"
 
 echo [3/3] Starting Next.js Frontend in a new window...
 cd frontend

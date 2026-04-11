@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   BarChart3, 
   Package, 
@@ -10,19 +10,34 @@ import {
   Map, 
   LayoutDashboard,
   Settings,
-  LogOut
+  LogOut,
+  Brain,
+  AlertTriangle,
+  Radio
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
 const navItems = [
   { label: 'Demand Forecast', href: '/', icon: BarChart3 },
   { label: 'Inventory Status', href: '/inventory', icon: Package },
   { label: 'Alerts', href: '/alerts', icon: Bell },
   { label: 'Route Optimizer', href: '/routing', icon: Map },
+  { label: 'RL Reorder Agent', href: '/rl-agent', icon: Brain },
+  { label: 'Disruption Map', href: '/disruption', icon: AlertTriangle },
+  { label: 'External Signals', href: '/external-signals', icon: Radio },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <div className="flex flex-col h-screen w-64 bg-[#f2f3f8] border-r border-[#acb3ba]/20 text-[#2d3339]">
@@ -62,7 +77,10 @@ export default function Sidebar() {
           <Settings className="w-5 h-5" />
           <span>Settings</span>
         </button>
-        <button className="flex items-center gap-3 px-4 py-2 w-full text-[#9e3f4e] hover:text-[#4f0116] transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-2 w-full text-[#9e3f4e] hover:text-[#4f0116] transition-colors"
+        >
           <LogOut className="w-5 h-5" />
           <span>Logout</span>
         </button>
