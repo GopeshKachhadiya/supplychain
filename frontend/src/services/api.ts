@@ -35,7 +35,7 @@ export const fetchProducts = async () => {
 };
 
 export const fetchWarehouses = async () => {
-    const res = await api.get('/api/forecast/warehouses');
+    const res = await api.get('/api/routing/warehouses');
     return res.data.warehouses;
 };
 

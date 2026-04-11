@@ -23,21 +23,11 @@ const Map = dynamic(() => import('@/components/Map'), {
   loading: () => <div className="w-full h-full flex items-center justify-center bg-[#f2f3f8]">Loading Map...</div>
 });
 
-const LOCATIONS: any = {
-  'WH_01': { name: 'Mumbai Hub', coords: [19.0760, 72.8777] },
-  'WH_02': { name: 'Delhi Terminal', coords: [28.7041, 77.1025] },
-  'WH_03': { name: 'Bangalore Center', coords: [12.9716, 77.5946] },
-  'WH_04': { name: 'Kolkata Depot', coords: [22.5726, 88.3639] },
-  'WH_05': { name: 'Hyderabad Port', coords: [17.3850, 78.4867] },
-  'WH_06': { name: 'Chennai Hub', coords: [13.0827, 80.2707] },
-  'WH_07': { name: 'Ahmedabad Depot', coords: [23.0225, 72.5714] },
-  'WH_08': { name: 'Pune Terminal', coords: [18.5204, 73.8567] },
-  'WH_09': { name: 'Surat Center', coords: [21.1702, 72.8311] },
-  'WH_10': { name: 'Jaipur Depot', coords: [26.9124, 75.7873] },
-};
+
 
 export default function RouteOptimizer() {
   const [warehouses, setWarehouses] = useState<string[]>([]);
+  const [LOCATIONS, setLocations] = useState<any>({});
   const [startPoint, setStartPoint] = useState('WH_01');
   const [selectedStops, setSelectedStops] = useState<string[]>(['WH_02', 'WH_03']);
   const [routeResult, setRouteResult] = useState<any>(null);
@@ -46,8 +36,15 @@ export default function RouteOptimizer() {
 
   useEffect(() => {
     async function init() {
-      const whs = await fetchWarehouses();
-      setWarehouses(whs);
+      const data = await fetchWarehouses();
+      const whList = [];
+      const locMap: any = {};
+      for (const w of data) {
+         whList.push(w.id);
+         locMap[w.id] = { name: w.name, coords: [w.lat, w.lon] };
+      }
+      setWarehouses(whList);
+      setLocations(locMap);
     }
     init();
   }, []);

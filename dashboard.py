@@ -108,6 +108,8 @@ with tab4:
         "WH_04": "Kolkata",   "WH_05": "Hyderabad", "WH_06": "Chennai",
         "WH_07": "Ahmedabad", "WH_08": "Pune",      "WH_09": "Surat",
         "WH_10": "Jaipur",
+        "GN_01": "Gandhinagar InfoCity", "GN_02": "Gandhinagar Sector 11",
+        "GN_03": "Gandhinagar Sector 21",
     }
 
     # Persist results across Streamlit re-runs (e.g. map pan/zoom)
@@ -116,7 +118,7 @@ with tab4:
     if "route_wh_coords" not in st.session_state:
         st.session_state.route_wh_coords = None
 
-    all_warehouses = [f"WH_{str(i).zfill(2)}" for i in range(1, 11)]
+    all_warehouses = [f"WH_{str(i).zfill(2)}" for i in range(1, 11)] + ["GN_01", "GN_02", "GN_03"]
     stops = st.multiselect(
         "Select warehouses to visit",
         [w for w in all_warehouses if w != warehouse_id],
