@@ -3,3 +3,14 @@ __pycache__/
 .env
 .ipynb_checkpoints/
 .DS_Store
+
+# Generated artifacts
+sales_features.csv
+arima_demand_model.pkl
+arima_forecast_plot.png
+inventory_optimization_results.csv
+
+# Frontend artifacts
+frontend/.next/
+frontend/node_modules/
+frontend/.vercel/
