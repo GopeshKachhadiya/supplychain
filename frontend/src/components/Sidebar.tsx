@@ -30,7 +30,7 @@ export default function Sidebar() {
         <div className="w-8 h-8 bg-gradient-to-br from-[#7b41b3] to-[#6f34a5] rounded-lg shadow-md flex items-center justify-center">
             <LayoutDashboard className="text-white w-5 h-5" />
         </div>
-        <h1 className="text-xl font-bold tracking-tight font-manrope">AntiGravity</h1>
+        <h1 className="text-xl font-bold tracking-tight font-manrope">AnvayaAI</h1>
       </div>
 
       <nav className="flex-1 px-4 py-6 space-y-2">

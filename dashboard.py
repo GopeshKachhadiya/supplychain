@@ -5,13 +5,13 @@ import plotly.graph_objects as go
 import requests
 
 st.set_page_config(
-    page_title="AntiGravity Supply Chain AI",
+    page_title="AnvayaAI Supply Chain AI",
     page_icon="🚀",
     layout="wide"
 )
 
-st.title("🚀 AI-Driven Supply Chain Optimization")
-st.caption("Team AntiGravity | Hackathon 2025")
+st.title("🚀 AnvayaAI Supply Chain Optimization")
+st.caption("Team AnvayaAI | Hackathon 2025")
 
 BACKEND = "http://localhost:8000"
 
