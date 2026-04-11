@@ -18,7 +18,7 @@ We're building an **AI brain** for supply chains — inspired by Blinkit/Zepto's
 | Existing Tools | Our Edge |
 |---|---|
 | SAP, Oracle SCM — No real-time external signals | We use weather + holiday + social trend data from our CSV |
-| Single model forecasting | ARIMA/SARIMAX forecasting with real external signals |
+| Single model forecasting | XGBoost ensemble with feature engineering on real data |
 | Static routing | Dynamic reorder alerts based on live inventory |
 | Expensive & inaccessible | Open-source, local-first, demo-ready in 12 hours |
 
@@ -70,8 +70,8 @@ Daily external context signals.
 
 ```
 ┌─────────────────────────────────────────┐
-│         STREAMLIT / HTML DASHBOARD       │
-│     (Charts + Inventory Table + Alerts)  │
+│    CUSTOM FRONTEND (TS/React/Next.js)   │
+│    (Designed with Stitch AI, on Vercel) │
 └──────────────────┬──────────────────────┘
                    │ REST API calls
 ┌──────────────────▼──────────────────────┐
@@ -102,7 +102,7 @@ Daily external context signals.
 mkdir supply_chain_ai && cd supply_chain_ai
 
 # Install all dependencies at once
-pip install pandas numpy scikit-learn statsmodels fastapi uvicorn streamlit \
+pip install pandas numpy scikit-learn xgboost fastapi uvicorn \
             matplotlib seaborn plotly scipy joblib python-dotenv
 ```
 
@@ -184,16 +184,16 @@ top_prods = df.groupby('product_id')['units_sold'].sum().nlargest(5)
 print("\nTop 5 products:\n", top_prods)
 ```
 
-**Hour 2–4: Train ARIMA Demand Forecast Model**
+**Hour 2–4: Train XGBoost Demand Forecast Model**
 
 ```python
-# model_arima.py
+# model_xgboost.py
 import pandas as pd
 import numpy as np
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import joblib
-import matplotlib.pyplot as plt
-from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 df = pd.read_csv('sales_features.csv', parse_dates=['date'])
 
@@ -206,58 +206,44 @@ subset = df[(df['product_id'] == PRODUCT) &
             (df['warehouse_id'] == WAREHOUSE)].copy()
 subset = subset.sort_values('date')
 
-EXOG_FEATURES = [
+FEATURES = [
     'day_of_week', 'month', 'is_weekend', 'is_rainy',
     'is_holiday', 'social_trend_score', 'temperature',
-    'unit_price'
+    'unit_price', 'lag_7', 'lag_30', 'rolling_7_mean'
 ]
 TARGET = 'units_sold'
 
-train_size = int(len(subset) * 0.8)
-train = subset.iloc[:train_size]
-test = subset.iloc[train_size:]
+X = subset[FEATURES]
+y = subset[TARGET]
 
-model = SARIMAX(
-    train[TARGET],
-    exog=train[EXOG_FEATURES],
-    order=(2, 1, 2),
-    seasonal_order=(1, 0, 1, 7),
-    enforce_stationarity=False,
-    enforce_invertibility=False
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, shuffle=False)
+
+model = xgb.XGBRegressor(
+    n_estimators=200,
+    learning_rate=0.05,
+    max_depth=6,
+    random_state=42,
+    verbosity=0
 )
-model_fit = model.fit(disp=False)
+model.fit(X_train, y_train)
 
-forecast = model_fit.get_forecast(
-    steps=len(test),
-    exog=test[EXOG_FEATURES]
-)
-preds = forecast.predicted_mean.values
+preds = model.predict(X_test)
+mae   = mean_absolute_error(y_test, preds)
+mape  = np.mean(np.abs((y_test.values - preds) / (y_test.values + 1e-5))) * 100
 
-mae = mean_absolute_error(test[TARGET], preds)
-mape = np.mean(np.abs((test[TARGET].values - preds) / (test[TARGET].values + 1e-5))) * 100
+print(f"✅ XGBoost trained | MAE: {mae:.2f} | MAPE: {mape:.2f}%")
 
-print(f"✅ ARIMA trained | MAE: {mae:.2f} | MAPE: {mape:.2f}%")
+# Save model
+joblib.dump(model, 'xgb_demand_model.pkl')
+print("✅ Model saved → xgb_demand_model.pkl")
 
-artifacts = {
-    'model_fit': model_fit,
-    'product_id': PRODUCT,
-    'warehouse_id': WAREHOUSE,
-    'feature_columns': EXOG_FEATURES,
-    'avg_unit_price': float(subset['unit_price'].mean())
-}
-joblib.dump(artifacts, 'arima_demand_model.pkl')
-print("✅ Model saved → arima_demand_model.pkl")
-
-plt.figure(figsize=(10, 5))
-plt.plot(test['date'], test[TARGET].values, label='Actual', marker='o')
-plt.plot(test['date'], preds, label='Forecast', marker='o')
-plt.title('ARIMA Forecast vs Actual')
-plt.xlabel('Date')
-plt.ylabel('Units Sold')
-plt.legend()
+# Feature importance
+import matplotlib.pyplot as plt
+xgb.plot_importance(model, max_num_features=10)
 plt.tight_layout()
-plt.savefig('arima_forecast_plot.png')
-print("✅ Forecast chart saved")
+plt.savefig('feature_importance.png')
+print("✅ Feature importance chart saved")
 ```
 
 **Hour 4–5: Prediction API Function**
@@ -267,30 +253,27 @@ print("✅ Forecast chart saved")
 import pandas as pd
 import numpy as np
 import joblib
-from datetime import timedelta
+from datetime import date, timedelta
 
-artifacts = joblib.load('arima_demand_model.pkl')
-model_fit = artifacts['model_fit']
-TRAINED_PRODUCT = artifacts['product_id']
-TRAINED_WAREHOUSE = artifacts['warehouse_id']
-FEATURE_COLUMNS = artifacts['feature_columns']
-AVG_UNIT_PRICE = artifacts['avg_unit_price']
+model = joblib.load('xgb_demand_model.pkl')
 
 def predict_demand(product_id: str, warehouse_id: str,
                    start_date: str, days: int = 7) -> list:
     """
     Returns demand forecast for next `days` days.
-    Uses the trained ARIMA/SARIMAX model and future external signals.
+    Uses last known lag values from sales_features.csv
     """
+    df = pd.read_csv('sales_features.csv', parse_dates=['date'])
     external = pd.read_csv('supply_chain_external_factors.csv', parse_dates=['date'])
 
-    if product_id != TRAINED_PRODUCT or warehouse_id != TRAINED_WAREHOUSE:
-        raise ValueError(
-            f"Model trained only for {TRAINED_PRODUCT} / {TRAINED_WAREHOUSE}."
-        )
+    subset = df[(df['product_id'] == product_id) &
+                (df['warehouse_id'] == warehouse_id)].sort_values('date')
+
+    last_7  = subset['units_sold'].tail(7).values
+    last_30 = subset['units_sold'].tail(30).values
 
     start = pd.to_datetime(start_date)
-    future_rows = []
+    forecasts = []
 
     for i in range(days):
         fc_date = start + timedelta(days=i)
@@ -301,7 +284,7 @@ def predict_demand(product_id: str, warehouse_id: str,
         temperature   = float(ext_row['temperature'].values[0]) if len(ext_row) else 28
         weather       = ext_row['weather_condition'].values[0] if len(ext_row) else 'Sunny'
 
-        future_rows.append([
+        features = [[
             fc_date.dayofweek,
             fc_date.month,
             int(fc_date.dayofweek >= 5),
@@ -309,28 +292,18 @@ def predict_demand(product_id: str, warehouse_id: str,
             is_holiday,
             trend_score,
             temperature,
-            AVG_UNIT_PRICE
-        ])
+            subset['unit_price'].mean(),
+            last_7[-7] if len(last_7) >= 7 else last_7[0],
+            last_30[-30] if len(last_30) >= 30 else last_30[0],
+            np.mean(last_7)
+        ]]
 
-    future_exog = pd.DataFrame(future_rows, columns=FEATURE_COLUMNS)
-    forecast = model_fit.get_forecast(steps=days, exog=future_exog)
-    preds = np.maximum(0, forecast.predicted_mean.values)
-    conf_int = forecast.conf_int()
-
-    forecasts = []
-    for i in range(days):
-        fc_date = start + timedelta(days=i)
-        ext_row = external[external['date'] == fc_date]
-        is_holiday = int(ext_row['is_holiday'].values[0]) if len(ext_row) else 0
-        weather = ext_row['weather_condition'].values[0] if len(ext_row) else 'Sunny'
-        lower = max(0, int(conf_int.iloc[i, 0]))
-        upper = max(lower, int(conf_int.iloc[i, 1]))
-
+        pred = max(0, int(model.predict(features)[0]))
         forecasts.append({
             'date': str(fc_date.date()),
-            'predicted_demand': int(preds[i]),
-            'lower_bound': lower,
-            'upper_bound': upper,
+            'predicted_demand': pred,
+            'lower_bound': int(pred * 0.85),
+            'upper_bound': int(pred * 1.15),
             'is_holiday': is_holiday,
             'weather': weather
         })
@@ -701,189 +674,53 @@ if __name__ == '__main__':
 
 ---
 
-### 🔴 HOUR 5–8: Frontend Dashboard (Member 4)
+### 🔴 HOUR 5–8: Custom Frontend UI (Member 4)
 
-#### 👤 MEMBER 4 — Streamlit Dashboard (Hours 5–10)
+#### 👤 MEMBER 4 — Custom Frontend (Stitch AI + TS) (Hours 5–10)
 
-```python
-# dashboard.py
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-import requests
+**Hour 5–7: Design UI using Stitch AI**
 
-st.set_page_config(
-    page_title="AntiGravity Supply Chain AI",
-    page_icon="🚀",
-    layout="wide"
-)
+- Define the layout for 4 key views: Demand Forecast, Inventory Status, Alerts, Route Optimizer.
+- Export the design system from Stitch AI or translate the generated UI into a React/Next.js codebase using TypeScript.
+- Set up a standard `Next.js` project:
 
-# ── Header ──────────────────────────────────────────────────
-st.title("🚀 AI-Driven Supply Chain Optimization")
-st.caption("Team AntiGravity | Hackathon 2025")
-
-BACKEND = "http://localhost:8000"
-
-# ── Sidebar Controls ─────────────────────────────────────────
-st.sidebar.header("🔧 Controls")
-warehouse_id = st.sidebar.selectbox(
-    "Select Warehouse",
-    ["WH_01", "WH_02", "WH_03", "WH_04", "WH_05"]
-)
-product_id = st.sidebar.selectbox(
-    "Select Product",
-    [f"PRD_{str(i).zfill(3)}" for i in range(1, 21)]
-)
-forecast_days = st.sidebar.slider("Forecast Days", 7, 30, 14)
-
-# ── Tabs ─────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📈 Demand Forecast",
-    "📦 Inventory Status",
-    "🚨 Alerts",
-    "🗺️ Route Optimizer"
-])
-
-# ── Tab 1: Demand Forecast ───────────────────────────────────
-with tab1:
-    st.subheader(f"Demand Forecast — {product_id} @ {warehouse_id}")
-
-    if st.button("🔮 Run Forecast", key="btn_forecast"):
-        with st.spinner("Running XGBoost model..."):
-            try:
-                resp = requests.post(f"{BACKEND}/api/forecast/predict", json={
-                    "product_id": product_id,
-                    "warehouse_id": warehouse_id,
-                    "start_date": "2025-06-01",
-                    "days": forecast_days
-                })
-                data = resp.json()["forecasts"]
-                df_fc = pd.DataFrame(data)
-
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(
-                    x=df_fc['date'], y=df_fc['predicted_demand'],
-                    name='Predicted', line=dict(color='#6C63FF', width=2)
-                ))
-                fig.add_trace(go.Scatter(
-                    x=df_fc['date'], y=df_fc['upper_bound'],
-                    name='Upper Bound', line=dict(color='#ccc', dash='dot')
-                ))
-                fig.add_trace(go.Scatter(
-                    x=df_fc['date'], y=df_fc['lower_bound'],
-                    name='Lower Bound', fill='tonexty', fillcolor='rgba(108,99,255,0.1)',
-                    line=dict(color='#ccc', dash='dot')
-                ))
-                fig.update_layout(title='7–30 Day Demand Forecast with Confidence Bands',
-                                  xaxis_title='Date', yaxis_title='Units')
-                st.plotly_chart(fig, use_container_width=True)
-                st.dataframe(df_fc, use_container_width=True)
-
-            except Exception as e:
-                st.error(f"Backend error: {e}")
-                # Fallback demo chart
-                dates = pd.date_range('2025-06-01', periods=forecast_days)
-                demo = pd.DataFrame({
-                    'date': dates,
-                    'predicted_demand': np.random.randint(100, 400, forecast_days)
-                })
-                st.line_chart(demo.set_index('date'))
-
-# ── Tab 2: Inventory Status ──────────────────────────────────
-with tab2:
-    st.subheader(f"Inventory Status — {warehouse_id}")
-
-    if st.button("📊 Load Inventory", key="btn_inv"):
-        with st.spinner("Computing inventory metrics..."):
-            try:
-                resp = requests.get(f"{BACKEND}/api/inventory/status/{warehouse_id}")
-                data = resp.json()
-
-                col1, col2, col3 = st.columns(3)
-                col1.metric("Total Products", data['total_products'])
-                col2.metric("Active Alerts", data['alerts'], delta="⚠️" if data['alerts'] > 0 else None)
-                col3.metric("Warehouse", warehouse_id)
-
-                df_inv = pd.DataFrame(data['inventory'])
-
-                # Color code status
-                def color_status(val):
-                    colors = {'CRITICAL': 'background-color: #ff4444; color: white',
-                              'REORDER': 'background-color: #ffaa00; color: black',
-                              'OK': 'background-color: #44bb44; color: white'}
-                    return colors.get(val, '')
-
-                st.dataframe(
-                    df_inv.style.applymap(color_status, subset=['status']),
-                    use_container_width=True
-                )
-
-                # EOQ bar chart
-                fig = px.bar(df_inv.head(15), x='product_id', y='eoq',
-                             color='status',
-                             color_discrete_map={'OK':'green','REORDER':'orange','CRITICAL':'red'},
-                             title='Economic Order Quantity by Product')
-                st.plotly_chart(fig, use_container_width=True)
-
-            except Exception as e:
-                st.error(f"Backend error: {e}")
-
-# ── Tab 3: Alerts ────────────────────────────────────────────
-with tab3:
-    st.subheader("🚨 Real-Time Alerts")
-
-    try:
-        resp = requests.get(f"{BACKEND}/api/alerts/active")
-        alerts_data = resp.json()
-        st.metric("Total Active Alerts", alerts_data['total_alerts'])
-
-        for alert in alerts_data['alerts']:
-            severity_color = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢'}.get(alert['severity'], '⚪')
-            with st.expander(f"{severity_color} {alert['type']} — {alert.get('product_id','')}{alert.get('warehouse_id','')}"):
-                st.write(alert['message'])
-                st.json(alert)
-
-    except Exception as e:
-        st.error(f"Backend error: {e}")
-        # Demo alerts
-        for msg in ["🔴 PRD_003 at WH_01 — Critical stock below safety threshold",
-                    "🟡 Holiday demand spike expected on 2025-08-15",
-                    "🟡 PRD_017 at WH_03 — Reorder point reached"]:
-            st.warning(msg)
-
-# ── Tab 4: Route Optimizer ───────────────────────────────────
-with tab4:
-    st.subheader("🗺️ Delivery Route Optimizer")
-
-    selected_stops = st.multiselect(
-        "Select Delivery Stops",
-        ["WH_01", "WH_02", "WH_03", "WH_04", "WH_05"],
-        default=["WH_02", "WH_03"]
-    )
-    start_wh = st.selectbox("Start Warehouse", ["WH_01", "WH_02", "WH_03"])
-
-    if st.button("🗺️ Optimize Route") and selected_stops:
-        import sys; sys.path.insert(0, '.')
-        from route_optimizer import nearest_neighbor_route
-        result = nearest_neighbor_route(start_wh, selected_stops)
-
-        st.success(f"✅ Optimized Route: {' → '.join(result['route'])}")
-        col1, col2 = st.columns(2)
-        col1.metric("Total Distance", f"{result['total_distance_km']} km")
-        col2.metric("Estimated Time", f"{result['estimated_time_hrs']} hrs")
-
-        # Map visualization
-        WH_COORDS = {
-            'WH_01': (19.0760, 72.8777), 'WH_02': (28.7041, 77.1025),
-            'WH_03': (12.9716, 77.5946), 'WH_04': (22.5726, 88.3639),
-            'WH_05': (17.3850, 78.4867),
-        }
-        route_coords = [WH_COORDS[w] for w in result['route'] if w in WH_COORDS]
-        df_map = pd.DataFrame(route_coords, columns=['lat', 'lon'])
-        st.map(df_map)
+```bash
+# Initialize frontend project
+npx create-next-app@latest frontend --typescript --tailwind --eslint
+cd frontend
+npm install axios recharts lucide-react
 ```
+
+**Hour 7–10: Implement API Integration & Deploy**
+
+- Wire up the frontend to fetch data from `http://localhost:8000`.
+
+```tsx
+// frontend/src/services/api.ts
+import axios from 'axios';
+
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+
+export const fetchForecast = async (productId: string, warehouseId: string, days: number = 7) => {
+    const res = await axios.post(`${BACKEND}/api/forecast/predict`, {
+        product_id: productId, warehouse_id: warehouseId, start_date: "2025-06-01", days
+    });
+    return res.data.forecasts;
+};
+
+export const fetchInventoryStatus = async (warehouseId: string) => {
+    const res = await axios.get(`${BACKEND}/api/inventory/status/${warehouseId}`);
+    return res.data;
+};
+
+export const fetchAlerts = async () => {
+    const res = await axios.get(`${BACKEND}/api/alerts/active`);
+    return res.data;
+};
+```
+
+- Build the necessary components for charts (using `recharts`) and data tables.
+- Deploy the finalized frontend to Vercel via GitHub integration.
 
 ---
 
@@ -898,8 +735,9 @@ with tab4:
 cd supply_chain_ai
 uvicorn main:app --reload --port 8000 &
 
-# Start dashboard
-streamlit run dashboard.py --server.port 8501
+# Start frontend
+cd frontend
+npm run dev
 ```
 
 **Integration Checklist:**
@@ -907,7 +745,7 @@ streamlit run dashboard.py --server.port 8501
 - [ ] `/api/forecast/predict` returns JSON forecasts
 - [ ] `/api/inventory/status/WH_01` returns inventory with EOQ
 - [ ] `/api/alerts/active` returns alert list
-- [ ] Dashboard connects to backend successfully
+- [ ] Frontend connects to backend successfully
 - [ ] Forecast chart renders with confidence bands
 - [ ] Inventory table shows color-coded status (OK/REORDER/CRITICAL)
 - [ ] Route optimizer shows result + map
@@ -970,10 +808,10 @@ curl http://localhost:8000/api/alerts/active
 
 | Member | Role | Hours Active | Key Output |
 |---|---|---|---|
-| Member 1 | ML Engineer | 1–5 | `arima_demand_model.pkl`, `predict_api.py` |
+| Member 1 | ML Engineer | 1–5 | `xgb_demand_model.pkl`, `predict_api.py` |
 | Member 2 | Backend Engineer | 1–4 | FastAPI running on port 8000 |
 | Member 3 | Optimization | 3–7 | `inventory_optimizer.py`, `route_optimizer.py` |
-| Member 4 | Frontend | 5–10 | Streamlit dashboard on port 8501 |
+| Member 4 | Frontend | 5–10 | Custom React/TS UI deployed on Vercel |
 | Member 5 | Team Lead / Integration | 6–12 | Full system wired + demo-ready |
 
 ---
@@ -989,8 +827,8 @@ supply_chain_ai/
 ├── validate_data.py                    ← Run first to verify datasets
 ├── eda_and_features.py                 ← EDA + feature engineering
 ├── sales_features.csv                  ← Processed features (generated)
-├── model_arima.py                      ← ARIMA training
-├── arima_demand_model.pkl              ← Trained model (generated)
+├── model_xgboost.py                    ← XGBoost training
+├── xgb_demand_model.pkl                ← Trained model (generated)
 ├── predict_api.py                      ← Forecast function
 │
 ├── inventory_optimizer.py              ← EOQ + Safety Stock
@@ -1004,7 +842,7 @@ supply_chain_ai/
 │   ├── inventory.py
 │   └── alerts.py
 │
-├── dashboard.py                        ← Streamlit dashboard
+├── frontend/                           ← Custom UI (Stitch AI + Next.js/TS)
 └── utils/mock_data.py                  ← Fallback demo data
 ```
 
@@ -1017,23 +855,24 @@ supply_chain_ai/
 cd supply_chain_ai
 
 # 2. Install dependencies
-pip install pandas numpy scikit-learn statsmodels fastapi uvicorn streamlit plotly scipy joblib
+pip install pandas numpy scikit-learn xgboost fastapi uvicorn plotly scipy joblib
 
 # 3. Verify datasets
 python validate_data.py
 
 # 4. Generate features + train model
 python eda_and_features.py
-python model_arima.py
+python model_xgboost.py
 
 # 5. Start backend
 uvicorn main:app --reload --port 8000
 
-# 6. Start dashboard (new terminal)
-streamlit run dashboard.py
+# 6. Start frontend (new terminal)
+cd frontend
+npm run dev
 
 # 7. Open browser
-# Dashboard: http://localhost:8501
+# Frontend: http://localhost:3000
 # API Docs:  http://localhost:8000/docs
 ```
 
@@ -1045,7 +884,7 @@ streamlit run dashboard.py
 |---|---|
 | **Innovation** | Ensemble of XGBoost + EOQ + external signals (weather, holidays, trends) |
 | **Real Data** | 730K+ rows across 3 professional CSV datasets |
-| **Working Demo** | Live backend + Streamlit dashboard |
+| **Working Demo** | Live backend + Custom Vercel deployed UI |
 | **Business Impact** | Stockout prevention, route optimization, holiday demand alerts |
 | **Code Quality** | Modular structure, typed APIs, fallback demo mode |
 | **Presentation** | Color-coded dashboard, Plotly charts, confidence bands |

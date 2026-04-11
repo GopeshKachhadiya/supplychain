@@ -7,17 +7,27 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from predict_api import predict_demand
+    from predict_api import predict_demand as real_predict_demand
 except ImportError:
-    # Mock fallback if Member 1 hasn't finished predict_api.py yet
-    def predict_demand(product_id: str, warehouse_id: str, start_date: str, days: int = 7) -> list:
-        import numpy as np, pandas as pd
-        dates = pd.date_range(start_date, periods=days)
-        base = np.random.randint(200, 400, days)
-        return [{'date': str(d.date()), 'predicted_demand': int(b),
-                 'lower_bound': int(b*0.85), 'upper_bound': int(b*1.15),
-                 'is_holiday': 0, 'weather': 'Sunny'}
-                for d, b in zip(dates, base)]
+    real_predict_demand = None
+
+def mock_predict_demand(product_id: str, warehouse_id: str, start_date: str, days: int = 7) -> list:
+    import numpy as np, pandas as pd
+    dates = pd.date_range(start_date, periods=days)
+    base = np.random.randint(200, 400, days)
+    return [{'date': str(d.date()), 'predicted_demand': int(b),
+             'lower_bound': int(b*0.85), 'upper_bound': int(b*1.15),
+             'is_holiday': 0, 'weather': 'Sunny'}
+            for d, b in zip(dates, base)]
+
+def predict_demand(product_id: str, warehouse_id: str, start_date: str, days: int = 7) -> list:
+    if real_predict_demand:
+        try:
+            return real_predict_demand(product_id, warehouse_id, start_date, days)
+        except ValueError:
+            # Fallback to mock if product/warehouse combo isn't trained
+            return mock_predict_demand(product_id, warehouse_id, start_date, days)
+    return mock_predict_demand(product_id, warehouse_id, start_date, days)
 
 router = APIRouter()
 

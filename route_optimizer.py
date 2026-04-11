@@ -27,43 +27,73 @@ class RouteOptimizer:
         return R * 2 * np.arcsin(np.sqrt(a))
 
     def get_optimal_route(self, start_wh: str, stops: list) -> dict:
-        """Greedy nearest-neighbor route starting from start_wh."""
+        """A* Algorithm to find the exact shortest path visiting all stops."""
+        import heapq
+        
         if start_wh not in self.WAREHOUSES:
             return {"error": f"Invalid start warehouse: {start_wh}"}
             
-        valid_stops = [s for s in stops if s in self.WAREHOUSES]
-        unvisited = list(valid_stops)
-        route = [start_wh]
-        current = start_wh
-        total_dist = 0
+        valid_stops = set([s for s in stops if s in self.WAREHOUSES])
+        if start_wh in valid_stops:
+            valid_stops.remove(start_wh)
+            
+        initial_unvisited = frozenset(valid_stops)
+        
+        # Priority Queue: (f_score, g_score, current_wh, unvisited_set, path)
+        pq = [(0, 0, start_wh, initial_unvisited, [start_wh])]
+        
+        # Track the minimum g_score for each state to prune worse paths
+        visited_states = {}
+        
+        while pq:
+            f, g, current, unvisited, path = heapq.heappop(pq)
+            
+            state = (current, unvisited)
+            if state in visited_states and visited_states[state] <= g:
+                continue
+            visited_states[state] = g
+            
+            # Goal Check: All stops visited
+            if not unvisited:
+                # Add distance to return to start warehouse
+                final_g = g + self.haversine(self.WAREHOUSES[current], self.WAREHOUSES[start_wh])
+                final_path = path + [start_wh]
+                return {
+                    'route': final_path,
+                    'total_distance_km': round(final_g, 1),
+                    'estimated_time_hrs': round(final_g / 60, 1),
+                    'stops_count': len(final_path)
+                }
+                
+            # Expand next possible stops
+            for next_wh in unvisited:
+                new_unvisited = unvisited - frozenset([next_wh])
+                step_cost = self.haversine(self.WAREHOUSES[current], self.WAREHOUSES[next_wh])
+                new_g = g + step_cost
+                
+                # Admissible Heuristic (h): 
+                if not new_unvisited:
+                    # If it's the last stop, h brings it directly back to start
+                    h = self.haversine(self.WAREHOUSES[next_wh], self.WAREHOUSES[start_wh])
+                else:
+                    # Minimum distance away + minimum distance back to start
+                    min_leave = min(self.haversine(self.WAREHOUSES[next_wh], self.WAREHOUSES[u]) for u in new_unvisited)
+                    min_return = min(self.haversine(self.WAREHOUSES[u], self.WAREHOUSES[start_wh]) for u in new_unvisited)
+                    h = min_leave + min_return
+                    
+                new_f = new_g + h
+                
+                heapq.heappush(pq, (new_f, new_g, next_wh, new_unvisited, path + [next_wh]))
+                
+        return {"error": "No valid route found."}
 
-        while unvisited:
-            nearest = min(unvisited,
-                          key=lambda w: self.haversine(self.WAREHOUSES[current], self.WAREHOUSES[w]))
-            dist = self.haversine(self.WAREHOUSES[current], self.WAREHOUSES[nearest])
-            total_dist += dist
-            route.append(nearest)
-            unvisited.remove(nearest)
-            current = nearest
-
-        # Return to start
-        total_dist += self.haversine(self.WAREHOUSES[current], self.WAREHOUSES[start_wh])
-        route.append(start_wh)
-
-        return {
-            'route': route,
-            'total_distance_km': round(total_dist, 1),
-            'estimated_time_hrs': round(total_dist / 60, 1),  # assume 60 km/h avg
-            'stops_count': len(route)
-        }
-
-def nearest_neighbor_route(start_wh: str, stops: list) -> dict:
+def a_star_route(start_wh: str, stops: list) -> dict:
     optimizer = RouteOptimizer()
     return optimizer.get_optimal_route(start_wh, stops)
 
 if __name__ == '__main__':
     stops = ['WH_02', 'WH_03', 'WH_04', 'WH_05']
-    result = nearest_neighbor_route('WH_01', stops)
+    result = a_star_route('WH_01', stops)
     print("Optimized Route:", " → ".join(result['route']))
     print(f"Total Distance : {result['total_distance_km']} km")
     print(f"Estimated Time : {result['estimated_time_hrs']} hours")

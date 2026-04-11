@@ -16,6 +16,13 @@ app.include_router(inventory.router,  prefix="/api/inventory",  tags=["Inventory
 app.include_router(alerts.router,     prefix="/api/alerts",     tags=["Alerts"])
 app.include_router(routing.router,    prefix="/api/routing",    tags=["Route Optimizer"])
 
+@app.get("/")
+def root():
+    return {
+        "message": "Welcome to AntiGravity Supply Chain API",
+        "endpoints": ["/health", "/docs", "/api/forecast", "/api/inventory", "/api/routing"]
+    }
+
 @app.get("/health")
 def health():
     return {"status": "ok", "team": "AntiGravity", "version": "1.0.0"}
