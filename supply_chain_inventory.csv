@@ -1,0 +1,101 @@
+product_id,category,holding_cost,supplier_lead_time_days
+PRD_001,Grocery,1.16,14
+PRD_002,Apparel,3.91,5
+PRD_003,Apparel,2.29,10
+PRD_004,Home Goods,4.13,7
+PRD_005,Home Goods,3.93,10
+PRD_006,Grocery,2.63,8
+PRD_007,Grocery,2.76,4
+PRD_008,Grocery,4.62,6
+PRD_009,Apparel,4.66,3
+PRD_010,Apparel,3.27,11
+PRD_011,Apparel,1.14,3
+PRD_012,Grocery,0.59,5
+PRD_013,Apparel,0.53,2
+PRD_014,Electronics,1.58,2
+PRD_015,Grocery,1.18,10
+PRD_016,Apparel,1.76,14
+PRD_017,Electronics,2.03,7
+PRD_018,Electronics,2.32,14
+PRD_019,Home Goods,2.87,7
+PRD_020,Electronics,2.92,10
+PRD_021,Home Goods,1.66,4
+PRD_022,Home Goods,2.13,9
+PRD_023,Home Goods,4.34,9
+PRD_024,Electronics,1.37,10
+PRD_025,Home Goods,1.12,13
+PRD_026,Home Goods,4.45,10
+PRD_027,Electronics,3.08,14
+PRD_028,Grocery,2.14,2
+PRD_029,Electronics,4.39,10
+PRD_030,Apparel,3.72,11
+PRD_031,Home Goods,4.36,4
+PRD_032,Home Goods,2.84,11
+PRD_033,Electronics,5.0,12
+PRD_034,Grocery,1.77,10
+PRD_035,Home Goods,3.36,3
+PRD_036,Grocery,2.27,13
+PRD_037,Electronics,3.89,14
+PRD_038,Home Goods,1.03,13
+PRD_039,Grocery,3.56,7
+PRD_040,Apparel,2.53,7
+PRD_041,Grocery,3.11,7
+PRD_042,Grocery,2.89,13
+PRD_043,Home Goods,2.0,5
+PRD_044,Home Goods,0.77,5
+PRD_045,Grocery,2.01,10
+PRD_046,Electronics,2.95,4
+PRD_047,Electronics,1.6,5
+PRD_048,Home Goods,4.5,7
+PRD_049,Apparel,1.67,2
+PRD_050,Apparel,4.76,13
+PRD_051,Grocery,3.24,2
+PRD_052,Grocery,4.99,2
+PRD_053,Electronics,3.46,12
+PRD_054,Electronics,1.26,4
+PRD_055,Grocery,2.53,12
+PRD_056,Home Goods,3.2,9
+PRD_057,Electronics,0.64,9
+PRD_058,Electronics,1.81,5
+PRD_059,Grocery,3.86,6
+PRD_060,Grocery,3.09,2
+PRD_061,Grocery,2.77,5
+PRD_062,Home Goods,3.84,13
+PRD_063,Grocery,4.35,9
+PRD_064,Home Goods,4.11,2
+PRD_065,Electronics,3.22,10
+PRD_066,Home Goods,2.35,4
+PRD_067,Grocery,2.88,5
+PRD_068,Apparel,4.46,10
+PRD_069,Home Goods,3.8,2
+PRD_070,Grocery,2.78,10
+PRD_071,Electronics,2.02,11
+PRD_072,Home Goods,3.32,14
+PRD_073,Grocery,4.96,7
+PRD_074,Grocery,3.64,6
+PRD_075,Electronics,4.84,8
+PRD_076,Apparel,3.13,9
+PRD_077,Apparel,1.28,2
+PRD_078,Home Goods,2.41,9
+PRD_079,Electronics,3.97,7
+PRD_080,Apparel,3.33,9
+PRD_081,Apparel,2.82,9
+PRD_082,Home Goods,2.26,13
+PRD_083,Home Goods,4.35,2
+PRD_084,Electronics,4.9,3
+PRD_085,Electronics,2.37,8
+PRD_086,Grocery,4.83,7
+PRD_087,Apparel,4.93,6
+PRD_088,Electronics,3.34,13
+PRD_089,Home Goods,3.38,13
+PRD_090,Apparel,1.61,5
+PRD_091,Electronics,0.58,14
+PRD_092,Grocery,4.42,14
+PRD_093,Home Goods,4.93,8
+PRD_094,Grocery,3.79,12
+PRD_095,Electronics,2.53,2
+PRD_096,Grocery,2.01,8
+PRD_097,Home Goods,3.98,3
+PRD_098,Electronics,3.34,5
+PRD_099,Home Goods,4.7,6
+PRD_100,Apparel,2.21,6
