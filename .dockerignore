@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Large data files (too big for Docker image — use cloud storage in production)
+sales_features.csv
+supply_chain_sales_master.csv
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Node  
+frontend/node_modules/
+frontend/.next/
+frontend/.npm
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db
+roadmap.md
+test_all.py

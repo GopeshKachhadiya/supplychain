@@ -1,0 +1,37 @@
+# render.yaml — Render Blueprint for AnvayaAI Supply Chain Platform
+# Deploys both backend (FastAPI) and frontend (Next.js) as separate Web Services
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ── 1. FastAPI Backend ────────────────────────────────────────────────────
+  - type: web
+    name: anvayaai-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    rootDir: .
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHON_ENV
+        value: production
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # ── 2. Next.js Frontend ──────────────────────────────────────────────────
+  - type: web
+    name: anvayaai-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    rootDir: .
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      # Replace with your actual backend Render URL after first deploy:
+      - key: NEXT_PUBLIC_BACKEND_URL
+        value: https://anvayaai-backend.onrender.com
+    healthCheckPath: /
+    autoDeploy: true
