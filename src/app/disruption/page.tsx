@@ -1,24 +1,14 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import {
-  AlertTriangle,
-  ChevronDown,
-  IndianRupee,
-  Route,
-  ShieldCheck,
-  Sparkles,
-  TimerReset,
-  TrendingUp,
-  Warehouse,
+  AlertTriangle, ChevronDown, IndianRupee, Route,
+  ShieldCheck, Sparkles, TimerReset, TrendingUp, Warehouse,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { computeDisruptionRoutes } from '@/lib/indiaRouting';
 
-const DisruptionLeafletMap = dynamic(
-  () => import('@/components/DisruptionLeafletMap'),
-  { ssr: false }
-);
+
 
 type DisruptionType =
   | 'Warehouse Offline'
@@ -75,83 +65,6 @@ const targetOptions: Record<DisruptionType, string[]> = {
   'Port Strike': ['Nhava Sheva Port', 'Chennai Port', 'Mundra Port'],
 };
 
-const routeLibrary: Record<string, RoutePoint[]> = {
-  'WH_01 - Mumbai Hub': [
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-    { name: 'Nashik Node', coords: [19.9975, 73.7898] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'WH_03 - Bengaluru Center': [
-    { name: 'Bengaluru Center', coords: [12.9716, 77.5946] },
-    { name: 'Hyderabad Port', coords: [17.385, 78.4867] },
-    { name: 'Nagpur Relay', coords: [21.1458, 79.0882] },
-  ],
-  'WH_05 - Hyderabad Port': [
-    { name: 'Hyderabad Port', coords: [17.385, 78.4867] },
-    { name: 'Vijayawada Depot', coords: [16.5062, 80.648] },
-    { name: 'Chennai Port', coords: [13.0827, 80.2707] },
-  ],
-  'Supplier Alpha / PRD_014': [
-    { name: 'Pune Supplier', coords: [18.5204, 73.8567] },
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'Supplier Nova / PRD_021': [
-    { name: 'Ahmedabad Supplier', coords: [23.0225, 72.5714] },
-    { name: 'Jaipur Relay', coords: [26.9124, 75.7873] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'Supplier Apex / PRD_033': [
-    { name: 'Kolkata Supplier', coords: [22.5726, 88.3639] },
-    { name: 'Bhubaneswar Node', coords: [20.2961, 85.8245] },
-    { name: 'Chennai Port', coords: [13.0827, 80.2707] },
-  ],
-  'PRD_014 - Smart Kettle': [
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-    { name: 'Surat Buffer', coords: [21.1702, 72.8311] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'PRD_021 - Energy Bars': [
-    { name: 'Bengaluru Center', coords: [12.9716, 77.5946] },
-    { name: 'Nagpur Relay', coords: [21.1458, 79.0882] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'PRD_033 - Festival Lights': [
-    { name: 'Chennai Port', coords: [13.0827, 80.2707] },
-    { name: 'Hyderabad Port', coords: [17.385, 78.4867] },
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-  ],
-  'Route MUM-DEL': [
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-    { name: 'Vadodara Checkpoint', coords: [22.3072, 73.1812] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'Route BLR-HYD': [
-    { name: 'Bengaluru Center', coords: [12.9716, 77.5946] },
-    { name: 'Kurnool Junction', coords: [15.8281, 78.0373] },
-    { name: 'Hyderabad Port', coords: [17.385, 78.4867] },
-  ],
-  'Route CHN-KOL': [
-    { name: 'Chennai Port', coords: [13.0827, 80.2707] },
-    { name: 'Visakhapatnam Node', coords: [17.6868, 83.2185] },
-    { name: 'Kolkata Depot', coords: [22.5726, 88.3639] },
-  ],
-  'Nhava Sheva Port': [
-    { name: 'Nhava Sheva Port', coords: [18.95, 72.95] },
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-    { name: 'Delhi DC', coords: [28.6139, 77.209] },
-  ],
-  'Chennai Port': [
-    { name: 'Chennai Port', coords: [13.0827, 80.2707] },
-    { name: 'Bengaluru Center', coords: [12.9716, 77.5946] },
-    { name: 'Hyderabad Port', coords: [17.385, 78.4867] },
-  ],
-  'Mundra Port': [
-    { name: 'Mundra Port', coords: [22.839, 69.721] },
-    { name: 'Ahmedabad Buffer', coords: [23.0225, 72.5714] },
-    { name: 'Mumbai Hub', coords: [19.076, 72.8777] },
-  ],
-};
 
 function buildSimulation(
   disruptionType: DisruptionType,
@@ -172,12 +85,9 @@ function buildSimulation(
     disruptionType === 'Weather Block (route unavailable)' ? 0.3 :
     0.38;
 
-  const routeSeed = routeLibrary[target] ?? routeLibrary['WH_01 - Mumbai Hub'];
-  const reroutedRoute = [
-    routeSeed[0],
-    { name: 'AI Flex Hub', coords: [20.5937, 78.9629] as [number, number] },
-    routeSeed[routeSeed.length - 1],
-  ];
+  // ── A* routing: real NH highway paths ──────────────────────────────────
+  const { primaryRoute, reroutedRoute, primaryKm, reroutedKm } = computeDisruptionRoutes(target);
+  const detourKm = Math.max(0, reroutedKm - primaryKm);
 
   const inventory = baseInventory.map((item, index) => {
     const impacted =
@@ -190,13 +100,7 @@ function buildSimulation(
     const adaptiveGain = impacted ? Math.round(item.stockBefore * 0.18) : Math.round(item.stockBefore * 0.05);
     const stockAfter = Math.max(42, item.stockBefore - loss + adaptiveGain);
     const eoqAfter = Math.round(item.eoqBefore * (impacted ? 1.12 + intensity / 300 : 1.04));
-
-    return {
-      ...item,
-      stockAfter,
-      eoqAfter,
-      impacted,
-    };
+    return { ...item, stockAfter, eoqAfter, impacted };
   });
 
   const costImpact = Math.round(185000 + intensity * 3100 + disruptionFactor * 90000);
@@ -204,43 +108,27 @@ function buildSimulation(
 
   return {
     inventory,
-    primaryRoute: routeSeed,
+    primaryRoute,
     reroutedRoute,
     costImpact,
     recoveryTime: `${recoveryDays} days`,
     comparisons: [
-      {
-        label: 'Fulfillment Rate',
-        before: '96.0%',
-        after: `${Math.min(99, 91 + intensity / 12).toFixed(1)}%`,
-        improvement: `+${Math.round(12 + intensity / 8)}%`,
-      },
-      {
-        label: 'Stockout Risk',
-        before: '18.4%',
-        after: `${Math.max(4.8, 9.5 - intensity / 35).toFixed(1)}%`,
-        improvement: `+${Math.round(28 + intensity / 6)}%`,
-      },
-      {
-        label: 'Transport Agility',
-        before: '61.0%',
-        after: `${Math.min(96, 78 + intensity / 5).toFixed(1)}%`,
-        improvement: `+${Math.round(18 + intensity / 7)}%`,
-      },
-      {
-        label: 'Supplier Coverage',
-        before: '2 backup lanes',
-        after: `${3 + Math.round(intensity / 25)} backup lanes`,
-        improvement: `+${Math.round(22 + intensity / 10)}%`,
-      },
+      { label: 'Fulfillment Rate',   before: '96.0%', after: `${Math.min(99, 91 + intensity / 12).toFixed(1)}%`, improvement: `+${Math.round(12 + intensity / 8)}%` },
+      { label: 'Stockout Risk',      before: '18.4%', after: `${Math.max(4.8, 9.5 - intensity / 35).toFixed(1)}%`, improvement: `+${Math.round(28 + intensity / 6)}%` },
+      { label: 'Transport Agility',  before: '61.0%', after: `${Math.min(96, 78 + intensity / 5).toFixed(1)}%`,  improvement: `+${Math.round(18 + intensity / 7)}%` },
+      { label: 'Supplier Coverage',  before: '2 backup lanes', after: `${3 + Math.round(intensity / 25)} backup lanes`, improvement: `+${Math.round(22 + intensity / 10)}%` },
     ],
     recommendations: [
-      `Pre-position ${Math.round(120 + intensity * 1.4)} units of PRD_021 at WH_03 and trigger a midnight cross-dock into the affected lane.`,
-      `Shift ${Math.round(18 + intensity / 3)}% of replenishment volume to the AI Flex Hub and hold expedited carrier capacity for 48 hours.`,
+      `A* rerouted via ${reroutedRoute.map(p => p.name).join(' → ')} (+${detourKm} km). Pre-position ${Math.round(120 + intensity * 1.4)} units of PRD_021 at WH_03.`,
+      `Shift ${Math.round(18 + intensity / 3)}% of replenishment to the AI-selected alternate corridor and hold expedited carrier capacity for 48 hours.`,
       `Increase EOQ on impacted SKUs by ${Math.round(8 + intensity / 8)}% and run a twice-daily control tower review until recovery stabilizes.`,
     ],
   };
 }
+
+
+
+
 
 export default function DisruptionSimulatorPage() {
   const [disruptionType, setDisruptionType] = useState<DisruptionType>('Warehouse Offline');
@@ -252,6 +140,7 @@ export default function DisruptionSimulatorPage() {
   );
 
   const selectedTargets = targetOptions[disruptionType];
+
 
   const impactedCount = useMemo(
     () => simulation.inventory.filter((item) => item.impacted).length,
@@ -269,10 +158,11 @@ export default function DisruptionSimulatorPage() {
     setTarget(targetOptions[value][0]);
   };
 
-  const simulateImpact = () => {
+  const simulateImpact = useCallback(() => {
     setSimulation(buildSimulation(disruptionType, target, intensity));
     setSimulationTick((prev) => prev + 1);
-  };
+  }, [disruptionType, target, intensity]);
+
 
   return (
     <div className="p-8 space-y-8 text-[#2d3339]">
@@ -337,8 +227,9 @@ export default function DisruptionSimulatorPage() {
             </div>
           </div>
 
+
           <button
-            onClick={simulateImpact}
+            onClick={() => simulateImpact()}
             className="flex items-center justify-center gap-3 rounded-2xl bg-[#7C3AED] px-6 py-4 text-sm font-bold text-white shadow-lg shadow-[#7C3AED]/25 transition hover:bg-[#6D28D9]"
           >
             <AlertTriangle className="h-5 w-5" />
@@ -522,19 +413,6 @@ export default function DisruptionSimulatorPage() {
         </div>
 
         <div className="space-y-8">
-          <div className="rounded-[2rem] border border-[#E9D5FF] bg-white p-8 shadow-sm">
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#2d3339]">Auto-Rerouted Path</h3>
-              <p className="text-sm text-[#596067]">Red shows the blocked lane, purple shows AnvayaAI’s recovery route.</p>
-            </div>
-            <div className="h-[340px] overflow-hidden rounded-[1.5rem] border border-[#DDD6FE]">
-              <DisruptionLeafletMap
-                primaryRoute={simulation.primaryRoute}
-                reroutedRoute={simulation.reroutedRoute}
-              />
-            </div>
-          </div>
-
           <div className="rounded-[2rem] border border-[#E9D5FF] bg-white p-8 shadow-sm">
             <h3 className="text-xl font-bold text-[#2d3339]">Disruption Economics</h3>
             <div className="mt-6 grid gap-4">

@@ -109,6 +109,11 @@ export default function AlertsView() {
                        WH: {alert.warehouse_id}
                      </span>
                    )}
+                   {alert.holiday_name && (
+                     <span className="bg-[#f0dbff] px-3 py-1 rounded-lg text-xs font-black text-[#7b41b3] uppercase tracking-wider">
+                       {alert.holiday_name}
+                     </span>
+                   )}
                 </div>
               </div>
 

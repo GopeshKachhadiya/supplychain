@@ -13,7 +13,7 @@ import {
   RefreshCcw,
   Box
 } from 'lucide-react';
-import { fetchWarehouses, fetchRoute } from '@/services/api';
+import { fetchRouteWarehouses, fetchRoute } from '@/services/api';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
 
@@ -36,7 +36,7 @@ export default function RouteOptimizer() {
 
   useEffect(() => {
     async function init() {
-      const data = await fetchWarehouses();
+      const data = await fetchRouteWarehouses();
       const whList = [];
       const locMap: any = {};
       for (const w of data) {

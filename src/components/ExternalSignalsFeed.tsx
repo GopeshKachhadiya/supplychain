@@ -127,12 +127,12 @@ const NEWS_ITEMS: NewsItem[] = [
 function SectionHeader({ title, subtitle, icon }: { title: string; subtitle: string; icon: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <div style={{ background: 'linear-gradient(135deg, #7C3AED, #9F67FF)' }} className="p-2 rounded-xl shadow-lg">
+      <div className="bg-[#7b41b3] p-2 rounded-xl shadow-md">
         {icon}
       </div>
       <div>
-        <h3 className="font-bold text-base text-white leading-tight">{title}</h3>
-        <p className="text-xs" style={{ color: '#A78BFA' }}>{subtitle}</p>
+        <h3 className="font-bold text-base text-[#2d3339] leading-tight">{title}</h3>
+        <p className="text-xs font-medium text-[#7b41b3] uppercase tracking-tight">{subtitle}</p>
       </div>
     </div>
   );
@@ -153,12 +153,12 @@ function WeatherPanel({ data, lastUpdated }: { data: WeatherCity[]; lastUpdated:
             <div className="flex items-center gap-3 flex-1">
               <div className="esf-weather-icon">{w.icon}</div>
               <div>
-                <p className="text-sm font-semibold text-white">{w.city}</p>
-                <p className="text-xs" style={{ color: '#C4B5FD' }}>{w.condition}</p>
+                <p className="text-sm font-bold text-[#2d3339]">{w.city}</p>
+                <p className="text-[11px] font-medium text-[#596067]">{w.condition}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1" style={{ color: '#FCD34D' }}>
+              <div className="flex items-center gap-1 text-[#f59e0b]">
                 <Thermometer className="w-3.5 h-3.5" />
                 <span className="text-sm font-mono font-bold">{w.temp}°C</span>
               </div>
@@ -169,9 +169,9 @@ function WeatherPanel({ data, lastUpdated }: { data: WeatherCity[]; lastUpdated:
           </div>
         ))}
       </div>
-      <div className="mt-4 flex items-center gap-2" style={{ color: '#7C3AED' }}>
-        <RefreshCw className="w-3 h-3 animate-spin-slow" />
-        <span className="text-[10px]">
+      <div className="mt-5 flex items-center gap-2 text-[#7b41b3]">
+        <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
+        <span className="text-[11px] font-bold tracking-tight">
           Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })} · Auto-refresh every 30s
         </span>
       </div>
@@ -197,9 +197,9 @@ function MarketTrendsPanel() {
 
           return (
             <div key={s.category} className="esf-market-row">
-              <div className="flex items-center gap-2 w-36">
+              <div className="flex items-center gap-3 w-40">
                 <span className="text-xl">{s.emoji}</span>
-                <span className="text-sm font-semibold text-white">{s.category}</span>
+                <span className="text-sm font-bold text-[#2d3339]">{s.category}</span>
               </div>
 
               {/* Trend arrow + delta */}
@@ -207,20 +207,20 @@ function MarketTrendsPanel() {
                 {isUp && <TrendingUp className="w-4 h-4" />}
                 {isDown && <TrendingDown className="w-4 h-4" />}
                 {!isUp && !isDown && <Minus className="w-4 h-4" />}
-                <span className="text-sm font-bold font-mono">
+                <span className="text-sm font-black font-mono">
                   {s.change > 0 ? `+${s.change}%` : s.change === 0 ? 'Stable' : `${s.change}%`}
                 </span>
               </div>
 
               {/* Label */}
-              <span className="text-xs flex-1 text-center" style={{ color: '#A78BFA' }}>{s.label}</span>
+              <span className="text-xs flex-1 text-center font-medium text-[#596067] tracking-tight">{s.label}</span>
 
               {/* Forecast bar */}
-              <div className="flex flex-col items-end gap-0.5">
-                <span className="text-[10px]" style={{ color: fgColor }}>
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: trendColor }}>
                   Forecast {s.forecastImpact > 0 ? '+' : ''}{s.forecastImpact}%
                 </span>
-                <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: '#3B2F6E' }}>
+                <div className="w-20 h-2 rounded-full overflow-hidden bg-[#f0f2f5]">
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{
@@ -253,21 +253,21 @@ function NewsCard({ item }: { item: NewsItem }) {
       className="esf-news-card"
       style={{ background: cfg.bg, borderLeft: `3px solid ${cfg.border}` }}
     >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex items-start gap-2">
-          <span className="text-xl leading-tight">{item.icon}</span>
-          <p className="text-sm text-white font-medium leading-snug">{item.title}</p>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl leading-none">{item.icon}</span>
+          <p className="text-sm text-[#2d3339] font-bold leading-snug">{item.title}</p>
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <span
-            className="text-[9px] font-bold px-2 py-0.5 rounded-full"
-            style={{ background: cfg.badge + '22', color: cfg.badge, border: `1px solid ${cfg.badge}` }}
+            className="text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm"
+            style={{ backgroundColor: 'white', color: cfg.badge, border: `1.5px solid ${cfg.badge}` }}
           >
             {cfg.label}
           </span>
-          <div className="flex items-center gap-1" style={{ color: '#7C3AED' }}>
-            <Clock className="w-3 h-3" />
-            <span className="text-[10px]">{item.minsAgo}m ago</span>
+          <div className="flex items-center gap-1.5 text-[#7b41b3]">
+            <Clock className="w-3.5 h-3.5" />
+            <span className="text-[11px] font-bold font-mono">{item.minsAgo}m ago</span>
           </div>
         </div>
       </div>
@@ -278,9 +278,9 @@ function NewsCard({ item }: { item: NewsItem }) {
           ))}
         </div>
       </div>
-      <div className="mt-2 flex items-start gap-1.5">
-        <CheckCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#A78BFA' }} />
-        <p className="text-xs" style={{ color: '#C4B5FD' }}>{item.suggestedAction}</p>
+      <div className="mt-3 flex items-start gap-2">
+        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#7b41b3]" />
+        <p className="text-[12px] font-medium text-[#596067] italic leading-tight">{item.suggestedAction}</p>
       </div>
     </div>
   );
@@ -356,36 +356,36 @@ function GaugeSVG({ score }: { score: number }) {
       {/* Background track */}
       <path
         d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`}
-        fill="none" stroke="#2D1B69" strokeWidth="14" strokeLinecap="round"
+        fill="none" stroke="#f0f2f5" strokeWidth="14" strokeLinecap="round"
       />
       {/* Green zone 0-30% */}
       <path
         d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R * Math.cos(-Math.PI + 0.3 * Math.PI)} ${cy + R * Math.sin(-Math.PI + 0.3 * Math.PI)}`}
-        fill="none" stroke="#065F4630" strokeWidth="14"
+        fill="none" stroke="#10b98120" strokeWidth="14"
       />
       {/* Yellow zone 30-70% */}
       <path
         d={`M ${cx + R * Math.cos(-Math.PI + 0.3 * Math.PI)} ${cy + R * Math.sin(-Math.PI + 0.3 * Math.PI)} A ${R} ${R} 0 0 1 ${cx + R * Math.cos(-Math.PI + 0.7 * Math.PI)} ${cy + R * Math.sin(-Math.PI + 0.7 * Math.PI)}`}
-        fill="none" stroke="#78350F30" strokeWidth="14"
+        fill="none" stroke="#f59e0b20" strokeWidth="14"
       />
       {/* Red zone 70-100% */}
       <path
         d={`M ${cx + R * Math.cos(-Math.PI + 0.7 * Math.PI)} ${cy + R * Math.sin(-Math.PI + 0.7 * Math.PI)} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`}
-        fill="none" stroke="#7F1D1D30" strokeWidth="14"
+        fill="none" stroke="#ef444420" strokeWidth="14"
       />
       {/* Active arc */}
       <path
         d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${needleX} ${needleY}`}
         fill="none" stroke={cfg.color} strokeWidth="14" strokeLinecap="round"
-        style={{ filter: `drop-shadow(0 0 6px ${cfg.color})` }}
+        style={{ filter: `drop-shadow(0 0 4px ${cfg.color}50)` }}
       />
       {/* Needle */}
-      <line x1={cx} y1={cy} x2={needleX} y2={needleY} stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r="5" fill={cfg.color} style={{ filter: `drop-shadow(0 0 4px ${cfg.color})` }} />
+      <line x1={cx} y1={cy} x2={needleX} y2={needleY} stroke="#2d3339" strokeWidth="3" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="6" fill={cfg.color} stroke="white" strokeWidth="2" />
       {/* Labels */}
-      <text x={cx - R - 4} y={cy + 18} fill="#6D28D9" fontSize="9" textAnchor="middle">0</text>
-      <text x={cx} y={cy - R - 8} fill="#6D28D9" fontSize="9" textAnchor="middle">50</text>
-      <text x={cx + R + 4} y={cy + 18} fill="#6D28D9" fontSize="9" textAnchor="middle">100</text>
+      <text x={cx - R - 6} y={cy + 22} fill="#757b83" fontSize="11" fontWeight="bold" textAnchor="middle">0</text>
+      <text x={cx} y={cy - R - 12} fill="#757b83" fontSize="11" fontWeight="bold" textAnchor="middle">50</text>
+      <text x={cx + R + 6} y={cy + 22} fill="#757b83" fontSize="11" fontWeight="bold" textAnchor="middle">100</text>
     </svg>
   );
 }
@@ -410,21 +410,21 @@ function RiskIndexPanel({ weatherData }: { weatherData: WeatherCity[] }) {
       <div className="w-full flex flex-col items-center gap-2">
         <GaugeSVG score={score} />
         <div className="text-center -mt-2">
-          <div className="text-5xl font-black font-mono" style={{ color: cfg.color, textShadow: `0 0 20px ${cfg.color}55` }}>
+        <div className="text-5xl font-black font-mono tracking-tighter" style={{ color: cfg.color }}>
             {score}
           </div>
-          <div className="text-xs font-bold tracking-widest mt-1" style={{ color: cfg.color }}>{cfg.label}</div>
+          <div className="text-[10px] font-black tracking-[0.2em] mt-2 uppercase" style={{ color: cfg.color }}>{cfg.label}</div>
         </div>
-        <div className="w-full mt-4 grid grid-cols-3 gap-2">
+        <div className="w-full mt-6 grid grid-cols-3 gap-3">
           {[
-            { label: 'Weather Events', val: highImpactCount, icon: <CloudRain className="w-3.5 h-3.5" />, color: '#F87171' },
-            { label: 'Critical Alerts', val: criticalNews, icon: <AlertTriangle className="w-3.5 h-3.5" />, color: '#FBBF24' },
-            { label: 'Market Dips', val: downTrends, icon: <TrendingDown className="w-3.5 h-3.5" />, color: '#A78BFA' },
+            { label: 'Weather Events', val: highImpactCount, icon: <CloudRain className="w-4 h-4" />, color: '#ef4444' },
+            { label: 'Critical Alerts', val: criticalNews, icon: <AlertTriangle className="w-4 h-4" />, color: '#f59e0b' },
+            { label: 'Market Dips', val: downTrends, icon: <TrendingDown className="w-4 h-4" />, color: '#7b41b3' },
           ].map(({ label, val, icon, color }) => (
-            <div key={label} className="esf-mini-stat" style={{ borderColor: color + '33' }}>
+            <div key={label} className="esf-mini-stat shadow-sm" style={{ border: `1.5px solid ${color}20`, backgroundColor: 'white' }}>
               <div style={{ color }}>{icon}</div>
-              <span className="text-lg font-bold" style={{ color }}>{val}</span>
-              <span className="text-[9px] text-center leading-tight" style={{ color: '#8B5CF6' }}>{label}</span>
+              <span className="text-xl font-black" style={{ color }}>{val}</span>
+              <span className="text-[10px] text-center font-bold tracking-tight uppercase leading-none mt-1" style={{ color: '#596067' }}>{label}</span>
             </div>
           ))}
         </div>
@@ -460,19 +460,19 @@ export default function ExternalSignalsFeed() {
             <Globe className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-black tracking-tight text-white">External Signals Feed</h2>
-            <p style={{ color: '#A78BFA' }} className="text-xs">Real-world factors impacting your supply chain · AnvayaAI</p>
+            <h2 className="text-3xl font-black tracking-tight text-[#2d3339]">External Signals Feed</h2>
+            <p className="text-sm font-medium text-[#7b41b3]">Real-world factors impacting your supply chain · AnvayaAI</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${pulse ? 'esf-pulse-anim' : ''}`}
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid #7C3AED44' }}>
+        <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-2xl shadow-sm ${pulse ? 'esf-pulse-anim' : ''}`}
+            style={{ backgroundColor: 'white', border: '1.5px solid #7b41b322' }}>
             <span className="esf-live-dot" />
-            <span className="text-xs font-semibold" style={{ color: '#C4B5FD' }}>LIVE FEED</span>
+            <span className="text-xs font-black tracking-widest text-[#7b41b3]">LIVE FEED</span>
           </div>
-          <div className="flex items-center gap-1.5" style={{ color: '#6D28D9' }}>
-            <BarChart2 className="w-4 h-4" />
-            <span className="text-xs">Supply Intelligence</span>
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-[#acb3ba]/20 shadow-sm text-[#596067]">
+            <BarChart2 className="w-4 h-4 text-[#7b41b3]" />
+            <span className="text-xs font-bold uppercase tracking-tight">Supply Intelligence</span>
           </div>
         </div>
       </div>
@@ -488,145 +488,157 @@ export default function ExternalSignalsFeed() {
       <style>{`
         .esf-root {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0D0820 0%, #130C2B 50%, #0F0A22 100%);
-          padding: 28px;
-          font-family: 'Segoe UI', system-ui, sans-serif;
+          background-color: #f9f9fc;
+          padding: 40px;
+          font-family: 'Inter', system-ui, sans-serif;
         }
 
         .esf-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 24px;
-          padding: 18px 24px;
-          border-radius: 16px;
-          background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(109,40,217,0.08));
-          border: 1px solid rgba(124,58,237,0.3);
-          backdrop-filter: blur(12px);
+          margin-bottom: 32px;
+          padding: 24px 32px;
+          border-radius: 24px;
+          background-color: white;
+          border: 1.5px solid rgba(172,179,186,0.15);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .esf-logo-ring {
-          width: 40px; height: 40px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, #7C3AED, #9F67FF);
+          width: 48px; height: 48px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, #7b41b3, #9F67FF);
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 0 20px rgba(124,58,237,0.5);
+          box-shadow: 0 8px 16px rgba(123,65,179,0.3);
         }
 
         .esf-live-dot {
           width: 8px; height: 8px;
           border-radius: 50%;
-          background: #A78BFA;
-          box-shadow: 0 0 6px #A78BFA;
+          background: #ef4444;
+          box-shadow: 0 0 8px #ef444450;
           display: inline-block;
-          animation: blink 1.4s infinite;
+          animation: blink 1s infinite;
         }
 
         @keyframes blink {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
+          50% { opacity: 0.4; }
         }
 
         .esf-pulse-anim {
           animation: pulse-border 0.8s ease;
         }
         @keyframes pulse-border {
-          0% { box-shadow: 0 0 0 0 rgba(167,139,250,0.6); }
-          100% { box-shadow: 0 0 0 8px rgba(167,139,250,0); }
+          0% { box-shadow: 0 0 0 0 rgba(123,65,179,0.4); }
+          100% { box-shadow: 0 0 0 12px rgba(123,65,179,0); }
         }
 
         .esf-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           grid-template-rows: auto auto;
-          gap: 20px;
+          gap: 32px;
         }
 
         .esf-panel {
-          background: linear-gradient(145deg, rgba(30,14,66,0.95), rgba(20,10,48,0.95));
-          border: 1px solid rgba(124,58,237,0.25);
-          border-radius: 16px;
-          padding: 22px;
-          backdrop-filter: blur(16px);
-          transition: border-color 0.3s, box-shadow 0.3s;
+          background-color: white;
+          border: 1.5px solid rgba(172,179,186,0.15);
+          border-radius: 24px;
+          padding: 32px;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+          transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
         }
         .esf-panel:hover {
-          border-color: rgba(124,58,237,0.55);
-          box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+          transform: translateY(-4px);
+          border-color: rgba(123,65,179,0.25);
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .esf-city-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 10px 14px;
-          border-radius: 10px;
-          background: rgba(124,58,237,0.07);
-          border: 1px solid rgba(124,58,237,0.15);
-          transition: background 0.2s;
+          padding: 16px 20px;
+          border-radius: 20px;
+          background-color: #f2f3f8;
+          border: 1px solid rgba(172,179,186,0.1);
+          transition: all 0.2s;
         }
         .esf-city-row:hover {
-          background: rgba(124,58,237,0.14);
+          background-color: white;
+          border-color: #7b41b344;
+          box-shadow: 0 4px 12px rgba(123,65,179,0.06);
         }
 
         .esf-weather-icon {
-          width: 34px; height: 34px;
-          border-radius: 10px;
-          background: rgba(124,58,237,0.2);
+          width: 42px; height: 42px;
+          border-radius: 12px;
+          background-color: white;
           display: flex; align-items: center; justify-content: center;
-          color: #C4B5FD;
+          border: 1.5px solid rgba(123,65,179,0.15);
+          color: #7b41b3;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .esf-badge {
-          font-size: 9px;
-          font-weight: 800;
-          letter-spacing: 0.5px;
-          padding: 3px 8px;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          padding: 4px 10px;
           border-radius: 20px;
           white-space: nowrap;
+          box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);
         }
         .esf-badge-red {
-          background: rgba(239,68,68,0.12);
-          color: #FCA5A5;
-          border: 1px solid rgba(239,68,68,0.35);
+          background-color: #fee2e2;
+          color: #dc2626;
+          border: 1.5px solid #fecaca;
         }
         .esf-badge-green {
-          background: rgba(52,211,153,0.12);
-          color: #6EE7B7;
-          border: 1px solid rgba(52,211,153,0.35);
+          background-color: #d1fae5;
+          color: #059669;
+          border: 1.5px solid #a7f3d0;
         }
 
         .esf-market-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 10px;
-          padding: 10px 14px;
-          border-radius: 10px;
-          background: rgba(124,58,237,0.06);
-          border: 1px solid rgba(124,58,237,0.13);
-          transition: background 0.2s;
+          gap: 16px;
+          padding: 16px 20px;
+          border-radius: 20px;
+          background-color: #f2f3f8;
+          border: 1px solid rgba(172,179,186,0.1);
+          transition: all 0.2s;
         }
         .esf-market-row:hover {
-          background: rgba(124,58,237,0.12);
+          background-color: white;
+          border-color: #7b41b344;
+          box-shadow: 0 4px 12px rgba(123,65,179,0.06);
         }
 
         .esf-news-card {
-          padding: 12px 14px;
-          border-radius: 10px;
-          transition: transform 0.2s;
+          padding: 20px;
+          border-radius: 20px;
+          transition: all 0.2s;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         .esf-news-card:hover {
-          transform: translateX(3px);
+          transform: translateX(4px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .esf-wh-chip {
-          font-size: 9px;
-          padding: 2px 7px;
+          font-size: 10px;
+          font-weight: 800;
+          padding: 3px 10px;
           border-radius: 20px;
-          background: rgba(124,58,237,0.15);
-          color: #C4B5FD;
-          border: 1px solid rgba(124,58,237,0.3);
+          background-color: white;
+          color: #7b41b3;
+          border: 1.5px solid #7b41b320;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .esf-mini-stat {
