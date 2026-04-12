@@ -38,11 +38,41 @@ def get_active_alerts():
 
     # Alert 2: Holiday alert from external factors
     upcoming = external[external['is_holiday'] == 1].tail(3)
+    
+    # Holiday detection map (Month, Day)
+    HOLIDAY_MAP = {
+        (10, 15): "Navratri Beginning",
+        (10, 20): "Navaratri Peak",
+        (10, 21): "Navaratri Peak",
+        (10, 22): "Navaratri Peak",
+        (10, 23): "Dussehra",
+        (10, 31): "Diwali Prep",
+        (11, 1): "Diwali Festival",
+        (11, 2): "Govardhan Puja",
+        (12, 24): "Christmas Eve",
+        (12, 25): "Christmas Day",
+        (12, 28): "Year-End Mega Sale",
+        (12, 29): "Year-End Mega Sale",
+        (12, 30): "Year-End Mega Sale",
+        (12, 31): "New Year's Eve",
+        (1, 1): "New Year's Day",
+        (1, 26): "Republic Day Sale",
+        (8, 15): "Independence Day Sale"
+    }
+
     for _, row in upcoming.iterrows():
+        dt = row['date']
+        # Try to find specific holiday, fallback to Year-End peak if in December, else Holiday Season
+        h_name = HOLIDAY_MAP.get((dt.month, dt.day))
+        if not h_name:
+            if dt.month == 12: h_name = "Year-End Peak"
+            else: h_name = "Holiday Season"
+        
         alerts.append({
             'type': 'HOLIDAY_DEMAND_SPIKE',
-            'date': str(row['date'].date()),
-            'message': f"Holiday on {row['date'].date()} — expect +40% demand spike",
+            'date': str(dt.date()),
+            'holiday_name': h_name,
+            'message': f"{h_name} Event — {dt.strftime('%d %b')} — Expected +40% Surge",
             'weather': row['weather_condition'],
             'severity': 'MEDIUM'
         })

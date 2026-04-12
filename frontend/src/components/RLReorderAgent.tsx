@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const THEME_COLOR = '#7C3AED';
+const THEME_COLOR = '#7b41b3';
 const MAX_EPISODES = 100;
 
 interface LogEntry {
@@ -176,26 +176,26 @@ export default function RLReorderAgent() {
   };
 
   return (
-    <div className="w-full h-full bg-slate-900 text-slate-200 p-6 rounded-xl shadow-2xl flex flex-col gap-6 font-sans border border-slate-800">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-slate-800 pb-4 gap-4">
+    <div className="w-full min-h-full bg-white text-[#2d3339] p-8 rounded-[2rem] shadow-sm flex flex-col gap-8 font-sans border border-[#acb3ba]/10">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-[#ebeef4] pb-6 gap-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
-            <Brain className="w-8 h-8 text-[#7C3AED]" />
+          <h2 className="text-3xl font-bold flex items-center gap-3 text-[#2d3339]">
+            <Brain className="w-10 h-10 text-[#7b41b3]" />
             RL Reorder Agent
           </h2>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-[#596067] text-base mt-2">
             Simulating Q-Learning inventory decisions
           </p>
         </div>
 
-        <div className="flex items-center gap-4 bg-slate-800/50 p-2 rounded-lg border border-slate-800">
-          <div className="flex flex-col items-center px-4 border-r border-slate-700">
-            <span className="text-xs text-slate-400 font-semibold tracking-wider">EPISODE</span>
-            <span className="text-xl font-mono font-bold text-white">{episode} <span className="text-slate-500 text-sm">/ {MAX_EPISODES}</span></span>
+        <div className="flex items-center gap-6 bg-[#f2f3f8] p-4 rounded-2xl border border-[#acb3ba]/10">
+          <div className="flex flex-col items-center px-4 border-r border-[#acb3ba]/30">
+            <span className="text-[10px] text-[#596067] font-bold uppercase tracking-widest mb-1">EPISODE</span>
+            <span className="text-2xl font-mono font-bold text-[#2d3339]">{episode} <span className="text-[#757b83] text-sm">/ {MAX_EPISODES}</span></span>
           </div>
           <div className="flex flex-col items-center px-4">
-            <span className="text-xs text-slate-400 font-semibold tracking-wider">CUMULATIVE REWARD</span>
-            <span className={`text-xl font-mono font-bold ${cumulativeReward >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <span className="text-[10px] text-[#596067] font-bold uppercase tracking-widest mb-1">CUMULATIVE REWARD</span>
+            <span className={`text-2xl font-mono font-bold ${cumulativeReward >= 0 ? 'text-green-600' : 'text-red-500'}`}>
               {cumulativeReward > 0 ? '+' : ''}{cumulativeReward}
             </span>
           </div>
@@ -204,38 +204,38 @@ export default function RLReorderAgent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Agent State Panel */}
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col gap-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-            <Activity className="w-32 h-32" />
+        <div className="bg-white rounded-3xl p-6 border border-[#acb3ba]/10 shadow-sm flex flex-col gap-5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity pointer-events-none">
+            <Activity className="w-32 h-32 text-[#7b41b3]" />
           </div>
           
-          <h3 className="font-semibold text-slate-300 flex items-center gap-2 uppercase tracking-wider text-sm mb-2">
-            <Target className="w-4 h-4 text-[#7C3AED]" /> Environment State
+          <h3 className="font-bold text-[#596067] flex items-center gap-2 uppercase tracking-widest text-xs mb-1">
+            <Target className="w-4 h-4 text-[#7b41b3]" /> Environment State
           </h3>
           
           <div className="grid grid-cols-2 gap-4 relative z-10">
-            <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50">
-              <div className="text-xs text-slate-500 flex items-center gap-1 mb-1"><MapPin className="w-3 h-3"/> Warehouse</div>
-              <div className="font-mono text-purple-400 font-medium">{currentState.warehouse}</div>
+            <div className="bg-[#f0dbff]/30 p-4 rounded-2xl border border-[#7b41b3]/10">
+              <div className="text-[10px] text-[#757b83] font-bold uppercase tracking-tight flex items-center gap-1.5 mb-1.5"><MapPin className="w-3.5 h-3.5"/> Warehouse</div>
+              <div className="font-mono text-[#7b41b3] font-bold text-lg">{currentState.warehouse}</div>
             </div>
-            <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50">
-              <div className="text-xs text-slate-500 flex items-center gap-1 mb-1"><Package className="w-3 h-3"/> Product</div>
-              <div className="font-mono text-purple-400 font-medium">{currentState.product}</div>
+            <div className="bg-[#f0dbff]/30 p-4 rounded-2xl border border-[#7b41b3]/10">
+              <div className="text-[10px] text-[#757b83] font-bold uppercase tracking-tight flex items-center gap-1.5 mb-1.5"><Package className="w-3.5 h-3.5"/> Product</div>
+              <div className="font-mono text-[#7b41b3] font-bold text-lg">{currentState.product}</div>
             </div>
             
-            <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 col-span-2">
-              <div className="flex justify-between items-end">
+            <div className="bg-[#f2f3f8] p-5 rounded-2xl border border-[#acb3ba]/10 col-span-2">
+              <div className="flex justify-between items-end gap-2">
                 <div>
-                  <div className="text-xs text-slate-500 mb-1">Current Stock</div>
-                  <div className="text-2xl font-mono text-white font-bold">{currentState.stockLevel}</div>
+                  <div className="text-[10px] text-[#757b83] font-bold uppercase mb-1">Current Stock</div>
+                  <div className="text-3xl font-mono text-[#2d3339] font-black">{currentState.stockLevel}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-slate-500 mb-1">Demand / Day</div>
-                  <div className="text-lg font-mono text-blue-400">{currentState.demandForecast}</div>
+                  <div className="text-[10px] text-[#757b83] font-bold uppercase mb-1">Demand / Day</div>
+                  <div className="text-xl font-mono text-blue-600 font-bold">{currentState.demandForecast}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-slate-500 mb-1">Est. Days Left</div>
-                  <div className={`text-lg font-mono font-bold ${currentState.daysToStockout < 3 ? 'text-red-400' : 'text-green-400'}`}>
+                  <div className="text-[10px] text-[#757b83] font-bold uppercase mb-1">Est. Days Left</div>
+                  <div className={`text-xl font-mono font-black ${currentState.daysToStockout < 3 ? 'text-red-500' : 'text-green-600'}`}>
                     {currentState.daysToStockout}
                   </div>
                 </div>
@@ -245,25 +245,25 @@ export default function RLReorderAgent() {
         </div>
 
         {/* Action Taken Panel */}
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-center items-center relative overflow-hidden transition-all duration-300">
-          <h3 className="absolute top-5 left-5 font-semibold text-slate-300 flex items-center gap-2 uppercase tracking-wider text-sm mb-2">
-            <Zap className="w-4 h-4 text-[#7C3AED]" /> Agent Action
+        <div className="bg-white rounded-3xl p-6 border border-[#acb3ba]/10 shadow-sm flex flex-col justify-center items-center relative overflow-hidden transition-all duration-300 group">
+          <h3 className="absolute top-6 left-6 font-bold text-[#596067] flex items-center gap-2 uppercase tracking-widest text-xs mb-1">
+            <Zap className="w-4 h-4 text-[#7b41b3]" /> Agent Action
           </h3>
 
           {!currentAction ? (
-             <div className="text-slate-500 italic mt-8">Waiting for simulation to start...</div>
+             <div className="text-[#757b83] italic mt-8 font-medium">Waiting for simulation to start...</div>
           ) : (
             <div key={episode} className="animate-in fade-in zoom-in duration-300 flex flex-col items-center text-center mt-6 w-full">
-               <div className={`text-4xl font-black mb-2 tracking-tight flex items-center gap-3 ${currentAction.type === 'REORDER' ? 'text-[#7C3AED]' : 'text-slate-300'}`}>
-                 {currentAction.type === 'REORDER' ? <Inbox className="w-8 h-8" /> : <Package className="w-8 h-8"/>}
+               <div className={`text-5xl font-black mb-3 tracking-tight flex items-center gap-4 ${currentAction.type === 'REORDER' ? 'text-[#7b41b3]' : 'text-[#2d3339]'}`}>
+                 {currentAction.type === 'REORDER' ? <Inbox className="w-10 h-10" /> : <Package className="w-10 h-10"/>}
                  {currentAction.type} {currentAction.type === 'REORDER' && currentAction.amount}
                </div>
                
-               <div className="text-sm bg-slate-900/80 px-4 py-2 rounded-md border border-slate-700 text-slate-300 mb-4 max-w-full truncate text-ellipsis">
-                 <span className="font-semibold text-slate-400">Reason:</span> {currentAction.reason}
+               <div className="text-sm bg-[#f2f3f8] px-5 py-3 rounded-2xl border border-[#acb3ba]/10 text-[#596067] mb-5 max-w-full font-medium shadow-inner">
+                 <span className="font-bold text-[#2d3339]">Reason:</span> {currentAction.reason}
                </div>
 
-               <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full font-bold text-lg ${currentAction.reward > 0 ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+               <div className={`inline-flex items-center gap-3 px-6 py-2 rounded-2xl font-black text-xl shadow-sm ${currentAction.reward > 0 ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
                  Reward: {currentAction.reward > 0 ? '+' : ''}{currentAction.reward}
                </div>
             </div>
@@ -271,19 +271,19 @@ export default function RLReorderAgent() {
         </div>
 
         {/* Controls Panel */}
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-center gap-5">
-           <h3 className="font-semibold text-slate-300 flex items-center gap-2 uppercase tracking-wider text-sm">
-            <Settings className="w-4 h-4 text-[#7C3AED]" /> Controls
+        <div className="bg-white rounded-3xl p-6 border border-[#acb3ba]/10 shadow-sm flex flex-col justify-center gap-6">
+           <h3 className="font-bold text-[#596067] flex items-center gap-2 uppercase tracking-widest text-xs">
+            <Settings className="w-4 h-4 text-[#7b41b3]" /> Controls
            </h3>
            
-           <div className="flex gap-3 mt-1">
+           <div className="flex gap-4">
              <button 
                 onClick={() => setIsRunning(!isRunning)}
                 disabled={episode >= MAX_EPISODES}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transition-all shadow-md ${
                   isRunning 
-                    ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50' 
-                    : 'bg-[#7C3AED] text-white hover:bg-[#6c30d9] shadow-lg shadow-purple-900/20 border border-[#8B5CF6]/50'
+                    ? 'bg-red-100 text-red-600 hover:bg-red-200 border border-red-200' 
+                    : 'bg-[#7b41b3] text-white hover:bg-[#6f34a5] border border-[#7b41b3]/20'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {isRunning ? <><Pause className="w-5 h-5"/> Pause</> : <><Play className="w-5 h-5"/> {episode === 0 ? 'Start Training' : 'Resume'}</>}
@@ -291,28 +291,28 @@ export default function RLReorderAgent() {
              
              <button 
                 onClick={handleReset}
-                className="px-4 bg-slate-700 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg flex items-center justify-center transition-all border border-slate-600"
+                className="px-5 bg-[#f2f3f8] text-[#596067] hover:text-[#2d3339] hover:bg-[#e1e2eb] rounded-2xl flex items-center justify-center transition-all border border-[#acb3ba]/20 shadow-sm"
                 title="Reset Agent"
               >
-                <RotateCcw className="w-5 h-5" />
+                <RotateCcw className="w-6 h-6" />
              </button>
            </div>
 
-           <div className="space-y-3 pt-2">
-             <div className="flex justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
-               <span>Sim Speed</span>
-               <span>{speed === 1000 ? 'Slow' : speed === 600 ? 'Medium' : speed === 200 ? 'Fast' : 'Custom'}</span>
+           <div className="space-y-4 pt-2">
+             <div className="flex justify-between text-xs text-[#596067] font-black uppercase tracking-widest">
+                <span>Sim Speed</span>
+                <span className="text-[#7b41b3]">{speed === 1000 ? 'Slow' : speed === 600 ? 'Medium' : speed === 200 ? 'Fast' : 'Custom'}</span>
              </div>
              <input 
                type="range" 
                min="100" 
                max="1500" 
                step="100"
-               value={2000 - speed} // Invert slider for intuitive feel (right = faster = lower ms)
+               value={2000 - speed} 
                onChange={(e) => setSpeed(2000 - parseInt(e.target.value))}
-               className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[#7C3AED]"
+               className="w-full h-2 bg-[#f2f3f8] rounded-2xl appearance-none cursor-pointer accent-[#7b41b3] border border-[#acb3ba]/10"
              />
-             <div className="flex justify-between text-[10px] text-slate-500">
+             <div className="flex justify-between text-[10px] text-[#757b83] font-bold uppercase">
                <span>Slow</span>
                <span>Fast</span>
              </div>
@@ -320,42 +320,43 @@ export default function RLReorderAgent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-96">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px]">
         {/* Learning Curve Chart */}
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col">
-          <h3 className="font-semibold text-slate-300 flex items-center gap-2 uppercase tracking-wider text-sm mb-4">
-            <TrendingUp className="w-4 h-4 text-[#7C3AED]" /> Learning Curve (Cumulative Reward)
+        <div className="bg-white rounded-[2rem] p-8 border border-[#acb3ba]/10 shadow-sm flex flex-col">
+          <h3 className="font-bold text-[#596067] flex items-center gap-2 uppercase tracking-widest text-xs mb-8">
+            <TrendingUp className="w-4 h-4 text-[#7b41b3]" /> Learning Curve
           </h3>
-          <div className="flex-1 w-full relative">
+          <div className="flex-1 w-full min-h-[350px] relative">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ebeef4" vertical={false} />
                 <XAxis 
                   dataKey="episode" 
-                  stroke="#64748b" 
+                  stroke="#757b83" 
                   fontSize={12} 
                   tickLine={false} 
                   axisLine={false} 
+                  dy={10}
                 />
                 <YAxis 
-                  stroke="#64748b" 
+                  stroke="#757b83" 
                   fontSize={12} 
                   tickLine={false} 
                   axisLine={false} 
                   tickFormatter={(val) => `${val > 0 ? '+' : ''}${val}`}
+                  dx={-5}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.5rem', color: '#f8fafc' }}
-                  itemStyle={{ color: '#c084fc', fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#ebeef4', borderRadius: '1rem', color: '#2d3339', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  itemStyle={{ color: '#7b41b3', fontWeight: 'bold' }}
                 />
-                {/* Visual rendering of the learning line */}
                 <Line 
                   type="monotone" 
                   dataKey="reward" 
                   stroke={THEME_COLOR} 
-                  strokeWidth={3}
+                  strokeWidth={4}
                   dot={false}
-                  activeDot={{ r: 6, fill: THEME_COLOR, stroke: '#0f172a', strokeWidth: 2 }}
+                  activeDot={{ r: 8, fill: THEME_COLOR, stroke: '#ffffff', strokeWidth: 3 }}
                   animationDuration={300}
                 />
               </LineChart>
@@ -364,46 +365,46 @@ export default function RLReorderAgent() {
         </div>
 
         {/* Decision Log Table */}
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col overflow-hidden">
-          <h3 className="font-semibold text-slate-300 flex items-center gap-2 uppercase tracking-wider text-sm mb-4">
-            <Activity className="w-4 h-4 text-[#7C3AED]" /> Decision Log
+        <div className="bg-white rounded-[2rem] p-8 border border-[#acb3ba]/10 shadow-sm flex flex-col overflow-hidden">
+          <h3 className="font-bold text-[#596067] flex items-center gap-2 uppercase tracking-widest text-xs mb-8">
+            <Activity className="w-4 h-4 text-[#7b41b3]" /> Decision Log
           </h3>
           
-          <div className="flex-1 overflow-x-auto overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex-1 overflow-x-auto overflow-y-auto pr-2 custom-scrollbar min-h-[350px]">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-400 bg-slate-900/50 uppercase sticky top-0 backdrop-blur-sm z-10 hidden sm:table-header-group">
+              <thead className="text-[10px] text-[#596067] bg-[#f2f3f8] uppercase sticky top-0 backdrop-blur-sm z-10 hidden sm:table-header-group">
                 <tr>
-                  <th className="px-3 py-2 rounded-tl-lg font-medium">Ep</th>
-                  <th className="px-3 py-2 font-medium">Product</th>
-                  <th className="px-3 py-2 font-medium">Action</th>
-                  <th className="px-3 py-2 rounded-tr-lg font-medium text-right">Reward</th>
+                  <th className="px-4 py-3 rounded-tl-2xl font-bold tracking-widest">Ep</th>
+                  <th className="px-4 py-3 font-bold tracking-widest">Product</th>
+                  <th className="px-4 py-3 font-bold tracking-widest">Action</th>
+                  <th className="px-4 py-3 rounded-tr-2xl font-bold tracking-widest text-right">Reward</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center text-slate-500 py-10 italic border-t border-slate-700/50">
+                    <td colSpan={4} className="text-center text-[#757b83] py-20 italic font-medium">
                       No simulations run yet.
                     </td>
                   </tr>
                 ) : (
                   logs.map((log) => (
-                    <tr key={log.id} className="border-b border-slate-700/50 last:border-0 hover:bg-slate-700/30 transition-colors animate-in slide-in-from-top-2">
-                      <td className="px-3 py-2.5 font-mono text-slate-400 whitespace-nowrap">#{log.id}</td>
-                      <td className="px-3 py-2.5">
-                        <div className="font-medium text-slate-300">{log.product}</div>
-                        <div className="text-[10px] text-slate-500 font-mono">{log.warehouse}</div>
+                    <tr key={log.id} className="border-b border-[#ebeef4] last:border-0 hover:bg-[#f9f9fc] transition-all animate-in slide-in-from-top-2">
+                       <td className="px-4 py-4 font-mono text-[#757b83] font-bold">#{log.id}</td>
+                       <td className="px-4 py-4">
+                        <div className="font-bold text-[#2d3339]">{log.product}</div>
+                        <div className="text-[10px] text-[#757b83] font-mono font-bold uppercase">{log.warehouse}</div>
                       </td>
-                      <td className="px-3 py-2.5">
-                         <div className={`font-semibold ${log.action.includes('REORDER') ? 'text-[#7C3AED]' : 'text-slate-400'}`}>
+                      <td className="px-4 py-4">
+                         <div className={`font-black uppercase tracking-tight ${log.action.includes('REORDER') ? 'text-[#7b41b3]' : 'text-[#757b83]'}`}>
                            {log.action}
                          </div>
-                         <div className="text-xs text-slate-500 max-w-[150px] truncate" title={log.reason}>
+                         <div className="text-[11px] text-[#596067] font-medium leading-tight mt-0.5">
                             {log.reason}
                          </div>
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono font-bold">
-                        <span className={log.reward > 0 ? 'text-green-400' : 'text-red-400'}>
+                      <td className="px-4 py-4 text-right font-mono font-black">
+                        <span className={log.reward > 0 ? 'text-green-600' : 'text-red-500'}>
                           {log.reward > 0 ? '+' : ''}{log.reward}
                         </span>
                       </td>
