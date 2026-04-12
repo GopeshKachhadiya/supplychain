@@ -9,4 +9,5 @@ python-multipart==0.0.20
 httpx==0.28.1
 pydantic==2.11.3
 requests
+geopy
 
