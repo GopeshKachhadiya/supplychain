@@ -9,8 +9,7 @@ echo [2/3] Starting FastAPI Backend in a new window...
 start "AntiGravity Backend" cmd /k "python -m uvicorn main:app --reload --port 8000"
 
 echo [3/3] Starting Next.js Frontend in a new window...
-cd frontend
-start "AntiGravity Frontend" cmd /k "npx next dev --webpack"
+start "AntiGravity Frontend" cmd /k "npm run dev"
 
 echo.
 echo ======================================================

@@ -1,0 +1,23 @@
+[
+    {
+        "order_id": "ORD_991",
+        "status": "In Transit",
+        "cargo": "PRD_001 (Generators)",
+        "priority": "High (Hospital)",
+        "standard_route_nodes": [
+            "WH_East",
+            "Hwy_95",
+            "City_Center",
+            "Hospital"
+        ],
+        "disruption_event": "Hwy_95_Flooded",
+        "ai_rerouted_path": [
+            "WH_East",
+            "County_Road_B",
+            "West_Bridge",
+            "City_Center",
+            "Hospital"
+        ],
+        "delay_incurred_mins": 45
+    }
+]

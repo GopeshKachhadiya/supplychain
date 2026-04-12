@@ -28,6 +28,8 @@ const navItems = [
   { label: 'External Signals', href: '/external-signals', icon: Radio },
 ];
 
+import DatasetUploader from '@/components/DatasetUploader';
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -48,7 +50,7 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold tracking-tight font-manrope">AnvayaAI</h1>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -73,6 +75,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-6 border-t border-[#acb3ba]/20 space-y-2">
+        <DatasetUploader />
         <button className="flex items-center gap-3 px-4 py-2 w-full text-[#596067] hover:text-[#2d3339] transition-colors">
           <Settings className="w-5 h-5" />
           <span>Settings</span>

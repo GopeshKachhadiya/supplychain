@@ -1,0 +1,8 @@
+date,weather_condition,temperature,is_holiday,social_trend_score
+2026-08-01,Clear,28.5,0,12
+2026-08-02,Clear,29.0,0,15
+2026-08-03,Cloudy,26.5,0,25
+2026-08-04,Rain,22.0,0,65
+2026-08-05,Extreme Storm,18.0,0,95
+2026-08-06,Extreme Storm,17.5,0,98
+2026-08-07,Rain,20.0,0,80

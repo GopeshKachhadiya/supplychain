@@ -11,10 +11,11 @@ arima_forecast_plot.png
 inventory_optimization_results.csv
 
 # Frontend artifacts
-frontend/.next/
-frontend/node_modules/
-frontend/.vercel/
-frontend/patch.js
+.next/
+node_modules/
+.vercel/
+patch.js
+.env*.local
 
 # Tool-specific files
 .codex-backups/

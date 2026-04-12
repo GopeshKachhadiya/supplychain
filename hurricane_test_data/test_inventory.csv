@@ -1,0 +1,8 @@
+date,product_id,current_stock_level,ai_recommended_action,order_quantity
+2026-08-01,PRD_001,50,Hold,0
+2026-08-02,PRD_001,47,Hold,0
+2026-08-03,PRD_001,39,EMERGENCY_RESTOCK,200
+2026-08-04,PRD_001,194,Hold,0
+2026-08-05,PRD_001,74,Hold,0
+2026-08-06,PRD_001,0,CRITICAL_STOCKOUT,0
+2026-08-07,PRD_001,0,Hold,0

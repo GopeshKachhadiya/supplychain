@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import forecast, inventory, alerts, routing
+from routers import forecast, inventory, alerts, routing, dataset
 
 app = FastAPI(
     title="AnvayaAI Supply Chain API",
@@ -15,6 +15,7 @@ app.include_router(forecast.router,   prefix="/api/forecast",   tags=["Forecasti
 app.include_router(inventory.router,  prefix="/api/inventory",  tags=["Inventory"])
 app.include_router(alerts.router,     prefix="/api/alerts",     tags=["Alerts"])
 app.include_router(routing.router,    prefix="/api/routing",    tags=["Route Optimizer"])
+app.include_router(dataset.router,    prefix="/api/dataset",    tags=["Dataset Management"])
 
 @app.get("/")
 def root():
