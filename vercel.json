@@ -5,18 +5,5 @@
       "source": "/api/:path*",
       "destination": "/api/index.py"
     }
-  ],
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": "build"
-      }
-    }
   ]
 }
